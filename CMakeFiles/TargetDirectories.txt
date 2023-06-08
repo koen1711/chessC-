@@ -1,0 +1,5 @@
+/home/koen/Documents/GitHub/raylib-boilerplate/CMakeFiles/edit_cache.dir
+/home/koen/Documents/GitHub/raylib-boilerplate/CMakeFiles/rebuild_cache.dir
+/home/koen/Documents/GitHub/raylib-boilerplate/src/CMakeFiles/myGame.dir
+/home/koen/Documents/GitHub/raylib-boilerplate/src/CMakeFiles/edit_cache.dir
+/home/koen/Documents/GitHub/raylib-boilerplate/src/CMakeFiles/rebuild_cache.dir

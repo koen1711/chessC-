@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/myGame.dir/Test.cpp.o CMakeFiles/myGame.dir/board.cpp.o CMakeFiles/myGame.dir/main.cpp.o CMakeFiles/myGame.dir/pieces.cpp.o CMakeFiles/myGame.dir/setup.cpp.o -o ../myGame  -lraylib 
