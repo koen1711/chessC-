@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/koen/Documents/GitHub/raylib-boilerplate/include
+CXX_INCLUDES = -I/home/koen/Documents/GitHub/chessC-/include
 
 CXX_FLAGS = 
 

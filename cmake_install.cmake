@@ -1,4 +1,4 @@
-# Install script for directory: /home/koen/Documents/GitHub/raylib-boilerplate
+# Install script for directory: /home/koen/Documents/GitHub/chessC-
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -44,7 +44,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/koen/Documents/GitHub/raylib-boilerplate/src/cmake_install.cmake")
+  include("/home/koen/Documents/GitHub/chessC-/src/cmake_install.cmake")
 
 endif()
 
@@ -56,5 +56,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/koen/Documents/GitHub/raylib-boilerplate/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/koen/Documents/GitHub/chessC-/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

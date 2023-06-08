@@ -1,7 +1,7 @@
 src/CMakeFiles/myGame.dir/setup.cpp.o: \
- /home/koen/Documents/GitHub/raylib-boilerplate/src/setup.cpp \
+ /home/koen/Documents/GitHub/chessC-/src/setup.cpp \
  /usr/include/stdc-predef.h \
- /home/koen/Documents/GitHub/raylib-boilerplate/src/setup.h \
+ /home/koen/Documents/GitHub/chessC-/src/setup.h \
  /usr/local/include/raylib.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/stdarg.h \
  /usr/include/c++/11/map /usr/include/c++/11/bits/stl_tree.h \
@@ -139,5 +139,8 @@ src/CMakeFiles/myGame.dir/setup.cpp.o: \
  /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
  /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
  /usr/include/c++/11/bits/charconv.h \
- /usr/include/c++/11/bits/basic_string.tcc /usr/include/c++/11/cstring \
+ /usr/include/c++/11/bits/basic_string.tcc /usr/include/c++/11/list \
+ /usr/include/c++/11/bits/stl_list.h \
+ /usr/include/c++/11/bits/allocated_ptr.h \
+ /usr/include/c++/11/bits/list.tcc /usr/include/c++/11/cstring \
  /usr/include/string.h /usr/include/strings.h

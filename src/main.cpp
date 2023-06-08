@@ -1,8 +1,8 @@
 #include "raylib.h"
 #include "main.h"
 #include "Test.h"
-#include "pieces.h"
 #include "board.h"
+#include "pieces.h"
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -27,9 +27,15 @@ int main(void) {
     
 
     board.drawBoard();
+    Vector2 mousePoint = { 0.0f, 0.0f };
 
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
+        mousePoint = GetMousePosition();
+
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            board.mouseLeftClick(mousePoint);
+        }
         BeginDrawing();
         EndDrawing();
     }

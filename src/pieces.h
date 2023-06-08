@@ -1,94 +1,75 @@
-#ifndef PIECES
-#define PIECES
+#ifndef PIECES_H
+#define PIECES_H
 
 #include "raylib.h"
 #include <string>
+#include <list>
+#include "board.h"
+
+class Board; // Forward declaration of the Board class
 
 class Piece
 {
-private:
-
 public:
+    char fenName;
     std::string color;
     std::string name;
     int position;
-    Piece();
-    ~Piece();
+    Board& board; // Reference to the Board object
 
+    Piece(int position, std::string color, char fenName, Board& board);
+    virtual ~Piece();
+    void drawMoves(std::list<int> moves);
+    virtual void move();
+    virtual std::list<int> getMoves() = 0;
 };
 
 class Pawn : public Piece
 {
-private:
-
 public:
-    Pawn() = default;
-    Pawn(int position, std::string color);
+    Pawn(int position, std::string color, char fenName, Board& board);
     ~Pawn();
-    int *getMoves();
-
+    std::list<int> getMoves() override;
 };
 
 class Rook : public Piece
 {
-private:
-
 public:
-    Rook() = default;
-    Rook(int position, std::string color);
+    Rook(int position, std::string color, char fenName, Board& board);
     ~Rook();
-    int *getMoves();
-    
+    std::list<int> getMoves() override;
 };
 
 class Knight : public Piece
 {
-private:
-    
 public:
-    Knight() = default;
-    Knight(int position, std::string color);
+    Knight(int position, std::string color, char fenName, Board& board);
     ~Knight();
-    int *getMoves();
-    
+    std::list<int> getMoves() override;
 };
 
 class Bishop : public Piece
 {
-private:
-    
 public:
-    Bishop() = default;
-    Bishop(int position, std::string color);
+    Bishop(int position, std::string color, char fenName, Board& board);
     ~Bishop();
-    int *getMoves();
-    
+    std::list<int> getMoves() override;
 };
 
 class Queen : public Piece
 {
-private:
-    
 public:
-    Queen() = default;
-    Queen(int position, std::string color);
+    Queen(int position, std::string color, char fenName, Board& board);
     ~Queen();
-    int *getMoves();
-    
+    std::list<int> getMoves() override;
 };
 
 class King : public Piece
 {
-private:
-    
 public:
-    King() = default;
-    King(int position, std::string color);
+    King(int position, std::string color, char fenName, Board& board);
     ~King();
-    int *getMoves();
-    
+    std::list<int> getMoves() override;
 };
 
-
-
-#endif
+#endif // PIECES_H

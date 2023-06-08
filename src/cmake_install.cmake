@@ -1,4 +1,4 @@
-# Install script for directory: /home/koen/Documents/GitHub/raylib-boilerplate/src
+# Install script for directory: /home/koen/Documents/GitHub/chessC-/src
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/koen/Documents/GitHub/raylib-boilerplate
+CMAKE_SOURCE_DIR = /home/koen/Documents/GitHub/chessC-
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/koen/Documents/GitHub/raylib-boilerplate
+CMAKE_BINARY_DIR = /home/koen/Documents/GitHub/chessC-
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,14 +87,14 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/koen/Documents/GitHub/raylib-boilerplate && $(CMAKE_COMMAND) -E cmake_progress_start /home/koen/Documents/GitHub/raylib-boilerplate/CMakeFiles /home/koen/Documents/GitHub/raylib-boilerplate/src//CMakeFiles/progress.marks
-	cd /home/koen/Documents/GitHub/raylib-boilerplate && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/koen/Documents/GitHub/raylib-boilerplate/CMakeFiles 0
+	cd /home/koen/Documents/GitHub/chessC- && $(CMAKE_COMMAND) -E cmake_progress_start /home/koen/Documents/GitHub/chessC-/CMakeFiles /home/koen/Documents/GitHub/chessC-/src//CMakeFiles/progress.marks
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/koen/Documents/GitHub/chessC-/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/koen/Documents/GitHub/raylib-boilerplate && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/clean
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/clean
 .PHONY : clean
 
 # The main clean target
@@ -103,22 +103,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/koen/Documents/GitHub/raylib-boilerplate && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/preinstall
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/koen/Documents/GitHub/raylib-boilerplate && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/preinstall
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/koen/Documents/GitHub/raylib-boilerplate && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/koen/Documents/GitHub/chessC- && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 src/CMakeFiles/myGame.dir/rule:
-	cd /home/koen/Documents/GitHub/raylib-boilerplate && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/CMakeFiles/myGame.dir/rule
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/CMakeFiles/myGame.dir/rule
 .PHONY : src/CMakeFiles/myGame.dir/rule
 
 # Convenience name for target.
@@ -127,7 +127,7 @@ myGame: src/CMakeFiles/myGame.dir/rule
 
 # fast build rule for target.
 myGame/fast:
-	cd /home/koen/Documents/GitHub/raylib-boilerplate && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/build
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/build
 .PHONY : myGame/fast
 
 Test.o: Test.cpp.o
@@ -135,7 +135,7 @@ Test.o: Test.cpp.o
 
 # target to build an object file
 Test.cpp.o:
-	cd /home/koen/Documents/GitHub/raylib-boilerplate && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/Test.cpp.o
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/Test.cpp.o
 .PHONY : Test.cpp.o
 
 Test.i: Test.cpp.i
@@ -143,7 +143,7 @@ Test.i: Test.cpp.i
 
 # target to preprocess a source file
 Test.cpp.i:
-	cd /home/koen/Documents/GitHub/raylib-boilerplate && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/Test.cpp.i
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/Test.cpp.i
 .PHONY : Test.cpp.i
 
 Test.s: Test.cpp.s
@@ -151,7 +151,7 @@ Test.s: Test.cpp.s
 
 # target to generate assembly for a file
 Test.cpp.s:
-	cd /home/koen/Documents/GitHub/raylib-boilerplate && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/Test.cpp.s
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/Test.cpp.s
 .PHONY : Test.cpp.s
 
 board.o: board.cpp.o
@@ -159,7 +159,7 @@ board.o: board.cpp.o
 
 # target to build an object file
 board.cpp.o:
-	cd /home/koen/Documents/GitHub/raylib-boilerplate && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/board.cpp.o
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/board.cpp.o
 .PHONY : board.cpp.o
 
 board.i: board.cpp.i
@@ -167,7 +167,7 @@ board.i: board.cpp.i
 
 # target to preprocess a source file
 board.cpp.i:
-	cd /home/koen/Documents/GitHub/raylib-boilerplate && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/board.cpp.i
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/board.cpp.i
 .PHONY : board.cpp.i
 
 board.s: board.cpp.s
@@ -175,7 +175,7 @@ board.s: board.cpp.s
 
 # target to generate assembly for a file
 board.cpp.s:
-	cd /home/koen/Documents/GitHub/raylib-boilerplate && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/board.cpp.s
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/board.cpp.s
 .PHONY : board.cpp.s
 
 main.o: main.cpp.o
@@ -183,7 +183,7 @@ main.o: main.cpp.o
 
 # target to build an object file
 main.cpp.o:
-	cd /home/koen/Documents/GitHub/raylib-boilerplate && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/main.cpp.o
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/main.cpp.o
 .PHONY : main.cpp.o
 
 main.i: main.cpp.i
@@ -191,7 +191,7 @@ main.i: main.cpp.i
 
 # target to preprocess a source file
 main.cpp.i:
-	cd /home/koen/Documents/GitHub/raylib-boilerplate && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/main.cpp.i
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/main.cpp.i
 .PHONY : main.cpp.i
 
 main.s: main.cpp.s
@@ -199,7 +199,7 @@ main.s: main.cpp.s
 
 # target to generate assembly for a file
 main.cpp.s:
-	cd /home/koen/Documents/GitHub/raylib-boilerplate && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/main.cpp.s
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/main.cpp.s
 .PHONY : main.cpp.s
 
 pieces.o: pieces.cpp.o
@@ -207,7 +207,7 @@ pieces.o: pieces.cpp.o
 
 # target to build an object file
 pieces.cpp.o:
-	cd /home/koen/Documents/GitHub/raylib-boilerplate && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/pieces.cpp.o
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/pieces.cpp.o
 .PHONY : pieces.cpp.o
 
 pieces.i: pieces.cpp.i
@@ -215,7 +215,7 @@ pieces.i: pieces.cpp.i
 
 # target to preprocess a source file
 pieces.cpp.i:
-	cd /home/koen/Documents/GitHub/raylib-boilerplate && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/pieces.cpp.i
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/pieces.cpp.i
 .PHONY : pieces.cpp.i
 
 pieces.s: pieces.cpp.s
@@ -223,7 +223,7 @@ pieces.s: pieces.cpp.s
 
 # target to generate assembly for a file
 pieces.cpp.s:
-	cd /home/koen/Documents/GitHub/raylib-boilerplate && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/pieces.cpp.s
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/pieces.cpp.s
 .PHONY : pieces.cpp.s
 
 setup.o: setup.cpp.o
@@ -231,7 +231,7 @@ setup.o: setup.cpp.o
 
 # target to build an object file
 setup.cpp.o:
-	cd /home/koen/Documents/GitHub/raylib-boilerplate && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/setup.cpp.o
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/setup.cpp.o
 .PHONY : setup.cpp.o
 
 setup.i: setup.cpp.i
@@ -239,7 +239,7 @@ setup.i: setup.cpp.i
 
 # target to preprocess a source file
 setup.cpp.i:
-	cd /home/koen/Documents/GitHub/raylib-boilerplate && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/setup.cpp.i
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/setup.cpp.i
 .PHONY : setup.cpp.i
 
 setup.s: setup.cpp.s
@@ -247,7 +247,7 @@ setup.s: setup.cpp.s
 
 # target to generate assembly for a file
 setup.cpp.s:
-	cd /home/koen/Documents/GitHub/raylib-boilerplate && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/setup.cpp.s
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/setup.cpp.s
 .PHONY : setup.cpp.s
 
 # Help Target
@@ -285,6 +285,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/koen/Documents/GitHub/raylib-boilerplate && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/koen/Documents/GitHub/chessC- && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

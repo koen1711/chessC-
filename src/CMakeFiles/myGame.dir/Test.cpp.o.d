@@ -1,7 +1,7 @@
 src/CMakeFiles/myGame.dir/Test.cpp.o: \
- /home/koen/Documents/GitHub/raylib-boilerplate/src/Test.cpp \
+ /home/koen/Documents/GitHub/chessC-/src/Test.cpp \
  /usr/include/stdc-predef.h \
- /home/koen/Documents/GitHub/raylib-boilerplate/include/Test.h \
+ /home/koen/Documents/GitHub/chessC-/include/Test.h \
  /usr/include/c++/11/iostream \
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/11/bits/os_defines.h \
