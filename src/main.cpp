@@ -1,6 +1,5 @@
 #include "raylib.h"
 #include "main.h"
-#include "Test.h"
 #include "board.h"
 #include "pieces.h"
 #include <iostream>
@@ -14,19 +13,18 @@
 int main(void) {
 
     Board board;
-    Test test;
-    std::cout << test.testInclude() << std::endl;
     // Initialization
     //--------------------------------------------------------------------------------------
 
-    InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
-
+    InitWindow(screenWidth, screenHeight, "Chess in C++");
+    // set trace log level
+    SetTraceLogLevel(LOG_WARNING);
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
     
 
-    board.drawBoard();
+    board.initBoard();
     Vector2 mousePoint = { 0.0f, 0.0f };
 
     while (!WindowShouldClose())    // Detect window close button or ESC key

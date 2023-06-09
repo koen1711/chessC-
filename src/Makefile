@@ -130,30 +130,6 @@ myGame/fast:
 	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/build
 .PHONY : myGame/fast
 
-Test.o: Test.cpp.o
-.PHONY : Test.o
-
-# target to build an object file
-Test.cpp.o:
-	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/Test.cpp.o
-.PHONY : Test.cpp.o
-
-Test.i: Test.cpp.i
-.PHONY : Test.i
-
-# target to preprocess a source file
-Test.cpp.i:
-	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/Test.cpp.i
-.PHONY : Test.cpp.i
-
-Test.s: Test.cpp.s
-.PHONY : Test.s
-
-# target to generate assembly for a file
-Test.cpp.s:
-	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/Test.cpp.s
-.PHONY : Test.cpp.s
-
 board.o: board.cpp.o
 .PHONY : board.o
 
@@ -259,9 +235,6 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... myGame"
-	@echo "... Test.o"
-	@echo "... Test.i"
-	@echo "... Test.s"
 	@echo "... board.o"
 	@echo "... board.i"
 	@echo "... board.s"

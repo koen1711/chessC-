@@ -69,24 +69,10 @@ include src/CMakeFiles/myGame.dir/progress.make
 # Include the compile flags for this target's objects.
 include src/CMakeFiles/myGame.dir/flags.make
 
-src/CMakeFiles/myGame.dir/Test.cpp.o: src/CMakeFiles/myGame.dir/flags.make
-src/CMakeFiles/myGame.dir/Test.cpp.o: src/Test.cpp
-src/CMakeFiles/myGame.dir/Test.cpp.o: src/CMakeFiles/myGame.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/koen/Documents/GitHub/chessC-/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object src/CMakeFiles/myGame.dir/Test.cpp.o"
-	cd /home/koen/Documents/GitHub/chessC-/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/myGame.dir/Test.cpp.o -MF CMakeFiles/myGame.dir/Test.cpp.o.d -o CMakeFiles/myGame.dir/Test.cpp.o -c /home/koen/Documents/GitHub/chessC-/src/Test.cpp
-
-src/CMakeFiles/myGame.dir/Test.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/myGame.dir/Test.cpp.i"
-	cd /home/koen/Documents/GitHub/chessC-/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/koen/Documents/GitHub/chessC-/src/Test.cpp > CMakeFiles/myGame.dir/Test.cpp.i
-
-src/CMakeFiles/myGame.dir/Test.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/myGame.dir/Test.cpp.s"
-	cd /home/koen/Documents/GitHub/chessC-/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/koen/Documents/GitHub/chessC-/src/Test.cpp -o CMakeFiles/myGame.dir/Test.cpp.s
-
 src/CMakeFiles/myGame.dir/board.cpp.o: src/CMakeFiles/myGame.dir/flags.make
 src/CMakeFiles/myGame.dir/board.cpp.o: src/board.cpp
 src/CMakeFiles/myGame.dir/board.cpp.o: src/CMakeFiles/myGame.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/koen/Documents/GitHub/chessC-/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object src/CMakeFiles/myGame.dir/board.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/koen/Documents/GitHub/chessC-/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object src/CMakeFiles/myGame.dir/board.cpp.o"
 	cd /home/koen/Documents/GitHub/chessC-/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/myGame.dir/board.cpp.o -MF CMakeFiles/myGame.dir/board.cpp.o.d -o CMakeFiles/myGame.dir/board.cpp.o -c /home/koen/Documents/GitHub/chessC-/src/board.cpp
 
 src/CMakeFiles/myGame.dir/board.cpp.i: cmake_force
@@ -100,7 +86,7 @@ src/CMakeFiles/myGame.dir/board.cpp.s: cmake_force
 src/CMakeFiles/myGame.dir/main.cpp.o: src/CMakeFiles/myGame.dir/flags.make
 src/CMakeFiles/myGame.dir/main.cpp.o: src/main.cpp
 src/CMakeFiles/myGame.dir/main.cpp.o: src/CMakeFiles/myGame.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/koen/Documents/GitHub/chessC-/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object src/CMakeFiles/myGame.dir/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/koen/Documents/GitHub/chessC-/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object src/CMakeFiles/myGame.dir/main.cpp.o"
 	cd /home/koen/Documents/GitHub/chessC-/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/myGame.dir/main.cpp.o -MF CMakeFiles/myGame.dir/main.cpp.o.d -o CMakeFiles/myGame.dir/main.cpp.o -c /home/koen/Documents/GitHub/chessC-/src/main.cpp
 
 src/CMakeFiles/myGame.dir/main.cpp.i: cmake_force
@@ -114,7 +100,7 @@ src/CMakeFiles/myGame.dir/main.cpp.s: cmake_force
 src/CMakeFiles/myGame.dir/pieces.cpp.o: src/CMakeFiles/myGame.dir/flags.make
 src/CMakeFiles/myGame.dir/pieces.cpp.o: src/pieces.cpp
 src/CMakeFiles/myGame.dir/pieces.cpp.o: src/CMakeFiles/myGame.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/koen/Documents/GitHub/chessC-/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object src/CMakeFiles/myGame.dir/pieces.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/koen/Documents/GitHub/chessC-/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object src/CMakeFiles/myGame.dir/pieces.cpp.o"
 	cd /home/koen/Documents/GitHub/chessC-/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/myGame.dir/pieces.cpp.o -MF CMakeFiles/myGame.dir/pieces.cpp.o.d -o CMakeFiles/myGame.dir/pieces.cpp.o -c /home/koen/Documents/GitHub/chessC-/src/pieces.cpp
 
 src/CMakeFiles/myGame.dir/pieces.cpp.i: cmake_force
@@ -128,7 +114,7 @@ src/CMakeFiles/myGame.dir/pieces.cpp.s: cmake_force
 src/CMakeFiles/myGame.dir/setup.cpp.o: src/CMakeFiles/myGame.dir/flags.make
 src/CMakeFiles/myGame.dir/setup.cpp.o: src/setup.cpp
 src/CMakeFiles/myGame.dir/setup.cpp.o: src/CMakeFiles/myGame.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/koen/Documents/GitHub/chessC-/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object src/CMakeFiles/myGame.dir/setup.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/koen/Documents/GitHub/chessC-/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object src/CMakeFiles/myGame.dir/setup.cpp.o"
 	cd /home/koen/Documents/GitHub/chessC-/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/myGame.dir/setup.cpp.o -MF CMakeFiles/myGame.dir/setup.cpp.o.d -o CMakeFiles/myGame.dir/setup.cpp.o -c /home/koen/Documents/GitHub/chessC-/src/setup.cpp
 
 src/CMakeFiles/myGame.dir/setup.cpp.i: cmake_force
@@ -141,7 +127,6 @@ src/CMakeFiles/myGame.dir/setup.cpp.s: cmake_force
 
 # Object files for target myGame
 myGame_OBJECTS = \
-"CMakeFiles/myGame.dir/Test.cpp.o" \
 "CMakeFiles/myGame.dir/board.cpp.o" \
 "CMakeFiles/myGame.dir/main.cpp.o" \
 "CMakeFiles/myGame.dir/pieces.cpp.o" \
@@ -150,14 +135,13 @@ myGame_OBJECTS = \
 # External object files for target myGame
 myGame_EXTERNAL_OBJECTS =
 
-myGame: src/CMakeFiles/myGame.dir/Test.cpp.o
 myGame: src/CMakeFiles/myGame.dir/board.cpp.o
 myGame: src/CMakeFiles/myGame.dir/main.cpp.o
 myGame: src/CMakeFiles/myGame.dir/pieces.cpp.o
 myGame: src/CMakeFiles/myGame.dir/setup.cpp.o
 myGame: src/CMakeFiles/myGame.dir/build.make
 myGame: src/CMakeFiles/myGame.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/koen/Documents/GitHub/chessC-/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable ../myGame"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/koen/Documents/GitHub/chessC-/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable ../myGame"
 	cd /home/koen/Documents/GitHub/chessC-/src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/myGame.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
