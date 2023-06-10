@@ -85,11 +85,79 @@ void Piece::move() {
 }
 
 std::list<int> Pawn::getMoves() {
-    return getPawnMoves();
+    std::list<int> moves = getPawnMoves();
+
+    std::list<int> validMoves;
+    for (int move : moves) {
+        if (board.pieces[move] == nullptr || board.pieces[move]->color != this->color) {
+            validMoves.push_back(move);
+        }
+    }
+    moves = validMoves;
+
+    bool check = false;
+    // get our king
+    if (color == std::string("white")) {
+        check = board.whiteKing->check;
+    } else {
+        check = board.blackKing->check;
+    }
+
+    if (check == true) {
+        // print all the moves that block the check
+        std::list<int> validMoves2;
+        // print all the moves that block the check
+        for (auto it = moves.begin(); it != moves.end(); ) {
+            int move = *it;
+            if (std::find(board.movesThatBlockCheck.begin(), board.movesThatBlockCheck.end(), move) != board.movesThatBlockCheck.end()) {
+                validMoves2.push_back(move);
+                ++it; // Move the iterator to the next element
+            } else {
+                it = moves.erase(it); // Erase the current element and get the iterator to the next element
+            }
+        }
+        moves = validMoves2;
+    }
+
+    return moves;
 }
 
 std::list<int> Rook::getMoves() {
-    return getRookMoves();
+    std::list<int> moves = getRookMoves();
+
+    std::list<int> validMoves;
+    for (int move : moves) {
+        if (board.pieces[move] == nullptr || board.pieces[move]->color != this->color) {
+            validMoves.push_back(move);
+        }
+    }
+    moves = validMoves;
+
+    bool check = false;
+    // get our king
+    if (color == std::string("white")) {
+        check = board.whiteKing->check;
+    } else {
+        check = board.blackKing->check;
+    }
+
+    if (check == true) {
+        // print all the moves that block the check
+        std::list<int> validMoves2;
+        // print all the moves that block the check
+        for (auto it = moves.begin(); it != moves.end(); ) {
+            int move = *it;
+            if (std::find(board.movesThatBlockCheck.begin(), board.movesThatBlockCheck.end(), move) != board.movesThatBlockCheck.end()) {
+                validMoves2.push_back(move);
+                ++it; // Move the iterator to the next element
+            } else {
+                it = moves.erase(it); // Erase the current element and get the iterator to the next element
+            }
+        }
+        moves = validMoves2;
+    }
+
+    return moves;
 }
 
 std::list<int> Bishop::getMoves() {
@@ -111,12 +179,70 @@ std::list<int> Bishop::getMoves() {
         }
     }
 
+    bool check = false;
+    // get our king
+    if (color == std::string("white")) {
+        check = board.whiteKing->check;
+    } else {
+        check = board.blackKing->check;
+    }
+
+    if (check == true) {
+        // print all the moves that block the check
+        std::list<int> validMoves2;
+        // print all the moves that block the check
+        for (auto it = moves.begin(); it != moves.end(); ) {
+            int move = *it;
+            if (std::find(board.movesThatBlockCheck.begin(), board.movesThatBlockCheck.end(), move) != board.movesThatBlockCheck.end()) {
+                validMoves2.push_back(move);
+                ++it; // Move the iterator to the next element
+            } else {
+                it = moves.erase(it); // Erase the current element and get the iterator to the next element
+            }
+        }
+        moves = validMoves2;
+    }
+
 
     return moves;
 }
 
 std::list<int> Knight::getMoves() {
-    return getKnightMoves();
+    std::list<int> moves = getKnightMoves();
+
+    std::list<int> validMoves;
+    for (int move : moves) {
+        if (board.pieces[move] == nullptr || board.pieces[move]->color != this->color) {
+            validMoves.push_back(move);
+        }
+    }
+    moves = validMoves;
+
+    bool check = false;
+    // get our king
+    if (color == std::string("white")) {
+        check = board.whiteKing->check;
+    } else {
+        check = board.blackKing->check;
+    }
+
+    if (check == true) {
+        // print all the moves that block the check
+        std::list<int> validMoves2;
+        // print all the moves that block the check
+        for (auto it = moves.begin(); it != moves.end(); ) {
+            int move = *it;
+            if (std::find(board.movesThatBlockCheck.begin(), board.movesThatBlockCheck.end(), move) != board.movesThatBlockCheck.end()) {
+                validMoves2.push_back(move);
+                ++it; // Move the iterator to the next element
+            } else {
+                it = moves.erase(it); // Erase the current element and get the iterator to the next element
+            }
+        }
+        moves = validMoves2;
+    }
+
+    return moves;
 }
 
 std::list<int> Queen::getMoves() {
@@ -142,20 +268,18 @@ std::list<int> Queen::getMoves() {
     bool check = false;
     // get our king
     if (color == std::string("white")) {
-        if (board.whiteKing->check == true) {
-            check = true;
-        }
+        check = board.whiteKing->check;
     } else {
-        if (board.blackKing->check == true) {
-            check = true;
-        }
+        check = board.blackKing->check;
     }
 
     if (check == true) {
+        // print all the moves that block the check
         std::list<int> validMoves2;
+        // print all the moves that block the check
         for (auto it = moves.begin(); it != moves.end(); ) {
             int move = *it;
-            if (std::find(board.movesThatBlockCheck.begin(), board.movesThatBlockCheck.end(), move) == board.movesThatBlockCheck.end()) {
+            if (std::find(board.movesThatBlockCheck.begin(), board.movesThatBlockCheck.end(), move) != board.movesThatBlockCheck.end()) {
                 validMoves2.push_back(move);
                 ++it; // Move the iterator to the next element
             } else {
@@ -170,7 +294,35 @@ std::list<int> Queen::getMoves() {
 }
 
 std::list<int> King::getMoves() {
-    return getKingMoves();
+    std::list<int> kingMoves = getKingMoves();
+
+    std::list<int> validMoves2;
+    for (int move : kingMoves) {
+        if (board.pieces[move]->color == this->color) {
+            validMoves2.remove(move);
+        }
+    }
+    std::cout << "validMoves2.size() = " << validMoves2.size() << std::endl;
+    kingMoves = validMoves2;
+
+    // remove all the moves that are in the whiteKingDoNotMove
+    std::list<int> validMoves;
+    if (color == std::string("white")) {
+        for (int move : kingMoves) {
+            // if the move is not in the whiteKingDoNotMove add it to the validMoves
+            if (std::find(board.whiteKingDoNotMove.begin(), board.whiteKingDoNotMove.end(), move) == board.whiteKingDoNotMove.end()) {
+                validMoves.push_back(move);
+            }
+        }
+    } else {
+        for (int move : kingMoves) {
+            if (std::find(board.blackKingDoNotMove.begin(), board.blackKingDoNotMove.end(), move) == board.blackKingDoNotMove.end()) {
+                validMoves.push_back(move);
+            }
+        }
+    }
+    kingMoves = validMoves;
+    return kingMoves;
 }
 
 std::list<int> Piece::getMoves()
@@ -221,6 +373,11 @@ void Pawn::makeMove(int pos) {
         return;
     }
 
+    // check if there is a piece in the position if so free the memory where it lives
+    if (board.pieces[pos] != nullptr) {
+        delete board.pieces[pos];
+    }
+
     board.pieces[pos] = this;
     board.pieces.erase(position);
     position = pos;
@@ -234,6 +391,11 @@ void Bishop::makeMove(int pos) {
 
     if (pos < 0 || pos >= board.pieces.size()) {
         return;
+    }
+
+    // check if there is a piece in the position if so free the memory where it lives
+    if (board.pieces[pos] != nullptr) {
+        delete board.pieces[pos];
     }
 
     board.pieces[pos] = this;
@@ -251,6 +413,11 @@ void Rook::makeMove(int pos) {
         return;
     }
 
+    // check if there is a piece in the position if so free the memory where it lives
+    if (board.pieces[pos] != nullptr) {
+        delete board.pieces[pos];
+    }
+
     board.pieces[pos] = this;
     board.pieces.erase(position);
     position = pos;
@@ -264,6 +431,11 @@ void Knight::makeMove(int pos) {
 
     if (pos < 0 || pos >= board.pieces.size()) {
         return;
+    }
+
+    // check if there is a piece in the position if so free the memory where it lives
+    if (board.pieces[pos] != nullptr) {
+        delete board.pieces[pos];
     }
 
     board.pieces[pos] = this;
@@ -281,6 +453,11 @@ void Queen::makeMove(int pos) {
         return;
     }
 
+    // check if there is a piece in the position if so free the memory where it lives
+    if (board.pieces[pos] != nullptr) {
+        delete board.pieces[pos];
+    }
+
     board.pieces[pos] = this;
     board.pieces.erase(position);
     position = pos;
@@ -295,13 +472,18 @@ void King::makeMove(int pos) {
     if (pos < 0 || pos >= board.pieces.size()) {
         return;
     }
+
+    // check if there is a piece in the position if so free the memory where it lives
+    if (board.pieces[pos] != nullptr) {
+        delete board.pieces[pos];
+    }
+
     board.pieces[pos] = this;
     board.pieces.erase(position);
     position = pos;
 }
 
-void Piece::makeMove(int pos) {
-}
+void Piece::makeMove(int pos) {}
 
 std::list<int> Piece::getBishopMoves() {
     std::list<int> moves;
@@ -459,39 +641,71 @@ std::list<int> Piece::getRookMoves() {
 }
 
 std::list<int> Piece::getKingMoves() {
-    std::list<int> moves;
 
-    if (board.pieces[position + 1] == nullptr) {
-        moves.push_back(position + 1);
-    }
-    if (board.pieces[position - 1] == nullptr) {
-        moves.push_back(position - 1);
-    }
-    if (board.pieces[position + 8] == nullptr) {
-        moves.push_back(position + 8);
-    }
-    if (board.pieces[position - 8] == nullptr) {
-        moves.push_back(position - 8);
-    }
-    if (board.pieces[position + 7] == nullptr) {
-        moves.push_back(position + 7);
-    }
-    if (board.pieces[position - 7] == nullptr) {
-        moves.push_back(position - 7);
-    }
-    if (board.pieces[position + 9] == nullptr) {
-        moves.push_back(position + 9);
-    }
-    if (board.pieces[position - 9] == nullptr) {
-        moves.push_back(position - 9);
+    bool up_allowed = true;
+    bool down_allowed = true;
+    bool left_allowed = true;
+    bool right_allowed = true;
+
+    if (board.topEdge.find(position) != board.topEdge.end()) {
+        up_allowed = false;
     }
 
-    return moves;
+    if (board.bottomEdge.find(position) != board.bottomEdge.end()) {
+        down_allowed = false;
+    }
+
+    if (board.leftEdge.find(position) != board.leftEdge.end()) {
+        left_allowed = false;
+    }
+
+    if (board.rightEdge.find(position) != board.rightEdge.end()) {
+        right_allowed = false;
+    }
+
+    std::list<int> movesKing;
+
+    if (down_allowed) {
+        movesKing.push_back(position + 8);
+        if (left_allowed) {
+            movesKing.push_back(position + 7);
+        }
+        if (right_allowed) {
+            movesKing.push_back(position + 9);
+        }
+    }
+
+    if (right_allowed) {
+        movesKing.push_back(position + 1);
+    }
+    if (left_allowed) {
+        movesKing.push_back(position - 1);
+    }
+    if (up_allowed) {
+        movesKing.push_back(position - 8);
+        if (left_allowed) {
+            movesKing.push_back(position - 9);
+        }
+        if (right_allowed) {
+            movesKing.push_back(position - 7);
+        }
+    }
+    return movesKing;
 }
 
 std::list<int> Piece::getPawnMoves() {
 
     std::list<int> moves;
+    bool left_up_allowed = true;
+    bool right_up_allowed = true;
+
+    if (board.leftEdge.find(position) != board.leftEdge.end()) {
+        left_up_allowed = false;
+    }
+
+    if (board.rightEdge.find(position) != board.rightEdge.end()) {
+        right_up_allowed = false;
+    }
 
     if (color == "white") {
         if (board.pieces[position - 8] == nullptr) {
@@ -499,11 +713,15 @@ std::list<int> Piece::getPawnMoves() {
             if (position < 56 && position > 47 && board.pieces[position - 16] == nullptr) {
                 moves = {position - 8, position - 16};
             }
-            if (board.pieces[position - 7] != nullptr && board.pieces[position - 7]->color != color) {
-                moves.push_back(position - 7);
+            if (right_up_allowed) {
+                if (board.pieces[position - 7] != nullptr && board.pieces[position - 7]->color != color) {
+                    moves.push_back(position - 7);
+                }
             }
-            if (board.pieces[position - 9] != nullptr && board.pieces[position - 9]->color != color) {
-                moves.push_back(position - 9);
+            if (left_up_allowed) {
+                if (board.pieces[position - 9] != nullptr && board.pieces[position - 9]->color != color) {
+                    moves.push_back(position - 9);
+                }
             }
         }
     } else {
@@ -513,11 +731,15 @@ std::list<int> Piece::getPawnMoves() {
             if (position < 16 && position > 7 && board.pieces[position + 16] == nullptr) {
                 moves = {position + 8, position + 16};
             }
-            if (board.pieces[position + 7] != nullptr && board.pieces[position + 7]->color != color) {
-                moves.push_back(position + 7);
+            if (left_up_allowed) {
+                if (board.pieces[position + 9] != nullptr && board.pieces[position + 9]->color != color) {
+                    moves.push_back(position + 9);
+                }
             }
-            if (board.pieces[position + 9] != nullptr && board.pieces[position + 9]->color != color) {
-                moves.push_back(position + 9);
+            if (right_up_allowed) {
+                if (board.pieces[position + 7] != nullptr && board.pieces[position + 7]->color != color) {
+                    moves.push_back(position + 7);
+                }
             }
         }
     }

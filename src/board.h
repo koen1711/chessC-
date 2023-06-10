@@ -30,6 +30,9 @@ public:
     std::string turn = "white";
     std::map<int, std::array<int, 2>> boardPositions;
     std::map<int, Piece*> pieces;
+    bool checkForCheckInPosition(std::map<int, Piece*> pieces1, std::string color);
+    void endGame();
+    bool checkIfPieceProtected(Piece* p);
     std::map<Piece*, std::string> piecePositions;
     std::list<int> potentialMoves;
     Piece* selectedPiece = nullptr;

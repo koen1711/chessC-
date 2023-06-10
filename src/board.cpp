@@ -157,14 +157,27 @@ void Board::fenNameToPiece(char fenName, int position) {
 
 Board::Board()
 {
-
 }
 
 Board::~Board()
 {
 }
 
+void Board::endGame() {
+    // loop through pieces and delete them
+    for (const auto& pair : pieces) {
+        delete pair.second;
+    }
+    Vector2 vec = MeasureTextEx(GetFontDefault(), "Game Over", 20, 1);
+    Vector2 fontPosition;
 
+    fontPosition.x = GetScreenWidth()/2 - MeasureTextEx(GetFontDefault(), "Game Over", 20, 1).x/2;
+    fontPosition.y = GetScreenHeight()/2 - 20/2 - 80;
+    BeginDrawing();
+    DrawRectangle((GetScreenHeight() / 2) - 150, (GetScreenHeight() / 2) - 100, 300, 200, DARKGRAY);
+    DrawTextEx(GetFontDefault(), "Game Over", fontPosition, 20, 1, BLACK);
+    EndDrawing();
+}
 
 
 
@@ -198,8 +211,25 @@ void Board::checkControlledSquares(const std::string& color) {
     }
 }
 
+bool Board::checkIfPieceProtected(Piece* p) {
+    for (const auto& pair : pieces) {
+        const auto& i = pair.second;
+        if (i == nullptr) {
+            continue;
+        } else if (i->color == p->color) {
+            for (const auto& j : i->getPotentialMoves()) {
+                if (j == p->position) {
+                    return true;
+                }
+            }
+        }
+    }
+}
+
 bool Board::checkForCheck(std::string color) {
     std::vector<int> moves_block_check;
+    std::vector<int> doNotGoKing;
+    bool check = false;
     int king_pos = findKing(color);
 
     if (king_pos == -1) {
@@ -212,39 +242,113 @@ bool Board::checkForCheck(std::string color) {
             continue;
         }
         if (piece->color != color && !dynamic_cast<King*>(piece)) {
-            if (canAttack(i, king_pos)) {
-                moves_block_check.push_back(i);
-                std::vector<int> line_of_attack = getLineOfAttack(i, king_pos);
-                for (int j : line_of_attack) {
-                    if (j != i && pieces[j]) {
-                        moves_block_check.push_back(j);
+            // check if the piece is a pawn
+            std::list<int> piece_moves;
+            if (dynamic_cast<Pawn*>(piece)) {
+                // check if white or black
+                if (piece->color == w) {
+                    if (piece->position == blackKing->position + 7 || piece->position == blackKing->position + 9) {
+                        check = true;
+                        piece_moves = {blackKing->position + 7, blackKing->position + 9};
+                    }
+                } else {
+                    if (piece->position == whiteKing->position - 7 || piece->position == whiteKing->position - 9) {
+                        check = true;
+                        piece_moves = {whiteKing->position - 7, whiteKing->position - 9};
                     }
                 }
+            } else {
+                piece_moves = piece->getMoves();
+            }
+            for (int move : piece_moves) {
+                if (move == king_pos) {
+                    check = true;
+                    moves_block_check.push_back(i);
+                    doNotGoKing.push_back(move);
+                    std::vector<int> line_of_attack = getLineOfAttack(i, king_pos);
+                    for (int j : line_of_attack) {
+                        moves_block_check.push_back(j);
+                        doNotGoKing.push_back(j);
+                    }
+                    break;  // No need to check further moves for this piece
+                } else {
+                    doNotGoKing.push_back(move);
+                }
+            }
+            moves_block_check.push_back(piece->position);
+            // check if piece is the piece who gives the check is protected
+            if (checkIfPieceProtected(piece)) {
+                doNotGoKing.push_back(piece->position);
             }
         }
     }
 
-    if (!moves_block_check.empty()) {
+    if (check == true) {
         movesThatBlockCheck = moves_block_check;
+        if (color == std::string("white")) {
+            whiteKingDoNotMove = doNotGoKing;
+        } else {
+            blackKingDoNotMove = doNotGoKing;
+        }
+
         return true;
     }
 
     return false;
 }
 
+bool Board::checkForCheckInPosition(std::map<int, Piece*> pieces1, std::string color) {
+    std::vector<int> moves_block_check;
+    std::vector<int> doNotGoKing;
+    int king_pos = findKing(color);
+    bool hitking = false;
+
+    if (king_pos == -1) {
+        return false;
+    }
+
+    for (int i = 0; i < 64; i++) {
+        Piece* piece = pieces1[i];
+        if (!piece) {
+            continue;
+        }
+        if (piece->color != color && !dynamic_cast<King*>(piece)) {
+            std::list<int> piece_moves = piece->getMoves();
+            for (int move : piece_moves) {
+                if (move == king_pos) {
+                    hitking = true;
+                    std::vector<int> line_of_attack = getLineOfAttack(i, king_pos);
+                    for (int j : line_of_attack) {
+                        moves_block_check.push_back(j);
+                    }
+                    break;  // No need to check further moves for this piece
+                }
+            }
+        }
+    }
+    if (hitking) {
+        return true;
+    }
+
+    return false;
+}
+
+
 bool Board::checkForCheckmate(std::string color) {
     if (checkForCheck(color)) {
-        // Check for possible moves to escape check
-        for (int i = 0; i < 64; i++) {
-            Piece* piece = pieces[i];
-            if (!piece) {
+        // if check loop through all friendly pieces can block the check
+        for (const auto& pair : pieces) {
+            const auto& i = pair.second;
+            if (i == nullptr) {
                 continue;
-            }
-            if (piece->color == color) {
-                std::list<int> moves1 = piece->getPotentialMoves();
-                std::vector<int> moves(moves1.begin(), moves1.end());
-                for (int move : moves) {
-                    if (!isPinned(i) && isLegalMove(i, move)) {
+            } else if (i->color == color) {
+                std::list<int> piece_moves = i->getMoves();
+                for (int move : piece_moves) {
+                    // now try to make the move and parse that position to the checkForCheckInPosition function
+                    std::map<int, Piece*> pieces1 = pieces;
+                    pieces1[move] = pieces1[i->position];
+                    pieces1[i->position] = nullptr;
+                    if (!checkForCheckInPosition(pieces1, color)) {
                         return false;
                     }
                 }
@@ -508,11 +612,8 @@ void Board::mouseLeftClick(Vector2 mousePoint) {
         } else {
             turn = w;
         }
-        std::cout << "Turn: " << turn << std::endl;
         bool check = checkForCheck(turn);
-        if (check) {
-            std::cout << "Check" << std::endl;
-        }
+        std::cout << "check: " << check << std::endl;
         if (turn == "white") {
             whiteKing->check = check;
         } else {
@@ -521,6 +622,11 @@ void Board::mouseLeftClick(Vector2 mousePoint) {
         potentialMoves.clear();
         selectedPiece = nullptr;
         drawBoard();
+        bool checkmate = checkForCheckmate(turn);
+        if (checkmate) {
+            endGame();
+            return;
+        }
         return;
     }
 
