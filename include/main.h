@@ -1,4 +1,4 @@
-#define screenWidth 800
-#define screenHeight 450
+#define screenWidth 650
+#define screenHeight 650
 
 #include <iostream>

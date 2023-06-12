@@ -2,9 +2,9 @@
 #define SETUP
 
 #include "raylib.h"
-#include<map>
-#include<string>
-#include<list>
+#include <map>
+#include <string>
+#include <list>
 
 class Setup
 {

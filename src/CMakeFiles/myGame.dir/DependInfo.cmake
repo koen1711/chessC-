@@ -10,7 +10,9 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/koen/Documents/GitHub/chessC-/src/board.cpp" "src/CMakeFiles/myGame.dir/board.cpp.o" "gcc" "src/CMakeFiles/myGame.dir/board.cpp.o.d"
   "/home/koen/Documents/GitHub/chessC-/src/main.cpp" "src/CMakeFiles/myGame.dir/main.cpp.o" "gcc" "src/CMakeFiles/myGame.dir/main.cpp.o.d"
+  "/home/koen/Documents/GitHub/chessC-/src/mainmenu.cpp" "src/CMakeFiles/myGame.dir/mainmenu.cpp.o" "gcc" "src/CMakeFiles/myGame.dir/mainmenu.cpp.o.d"
   "/home/koen/Documents/GitHub/chessC-/src/pieces.cpp" "src/CMakeFiles/myGame.dir/pieces.cpp.o" "gcc" "src/CMakeFiles/myGame.dir/pieces.cpp.o.d"
+  "/home/koen/Documents/GitHub/chessC-/src/settings.cpp" "src/CMakeFiles/myGame.dir/settings.cpp.o" "gcc" "src/CMakeFiles/myGame.dir/settings.cpp.o.d"
   "/home/koen/Documents/GitHub/chessC-/src/setup.cpp" "src/CMakeFiles/myGame.dir/setup.cpp.o" "gcc" "src/CMakeFiles/myGame.dir/setup.cpp.o.d"
   )
 

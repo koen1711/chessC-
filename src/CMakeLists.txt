@@ -7,4 +7,3 @@ file(GLOB SOURCES *.cpp)
 add_executable(myGame ${SOURCES})
 
 target_link_libraries(myGame raylib)
-

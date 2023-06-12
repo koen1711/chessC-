@@ -28,8 +28,6 @@
 #define w std::string("white")
 #define b std::string("black")
 
-using namespace std;
-
 std::string fenNameToColor(char fenName) {
     // if uper case then black
     // if lower case then white
@@ -54,34 +52,9 @@ std::string fenNameToColor(char fenName) {
     }
 }
 
-char fenNameToRealName(char fenName) {
-    switch (fenName)
-    {
-    case 'p':
-        return 'pawn';
-        break;
-    case 'r':
-        return 'rook';
-        break;
-    case 'n':
-        return 'knight';
-        break;
-    case 'b':
-        return 'bishop';
-        break;
-    case 'q':
-        return 'queen';
-        break;
-    case 'k':
-        return 'king';
-        break;
-    default:
-        return ' ';
-        break;
-    }
-}
-
-void renderPiece(const std::string& fenName, int piecePositionX, int piecePositionY) {
+void Board::renderPiece(const std::string& fenName, int piecePositionX, int piecePositionY) {
+    piecePositionX = clippingRect.x + piecePositionX;
+    piecePositionY = clippingRect.y + piecePositionY;
     if (fenName == "pawn-white") // White Pawn
         DrawTexture(WhitePawnTexture, piecePositionX, piecePositionY, WHITE);
     else if (fenName == "rook-white") // White Rook
@@ -107,8 +80,6 @@ void renderPiece(const std::string& fenName, int piecePositionX, int piecePositi
     else if (fenName == "king-black") // Black King
         DrawTexture(BlackKingTexture, piecePositionX, piecePositionY, WHITE);
 }
-
-
 
 void Board::fenNameToPiece(char fenName, int position) {
     switch (fenName) {
@@ -155,15 +126,11 @@ void Board::fenNameToPiece(char fenName, int position) {
     }
 }
 
-Board::Board()
-{
-}
+Board::Board(){}
 
-Board::~Board()
-{
-}
+Board::~Board(){}
 
-void Board::endGame() {
+void Board::endGame(std::string state) {
     // loop through pieces and delete them
     for (const auto& pair : pieces) {
         delete pair.second;
@@ -173,42 +140,16 @@ void Board::endGame() {
 
     fontPosition.x = GetScreenWidth()/2 - MeasureTextEx(GetFontDefault(), "Game Over", 20, 1).x/2;
     fontPosition.y = GetScreenHeight()/2 - 20/2 - 80;
+    BeginScissorMode(clippingRect.x, clippingRect.y, clippingRect.width, clippingRect.height);
     BeginDrawing();
     DrawRectangle((GetScreenHeight() / 2) - 150, (GetScreenHeight() / 2) - 100, 300, 200, DARKGRAY);
     DrawTextEx(GetFontDefault(), "Game Over", fontPosition, 20, 1, BLACK);
+    // display who won or draw
+    fontPosition.x = GetScreenWidth()/2 - MeasureTextEx(GetFontDefault(), state.c_str(), 20, 1).x/2;
+    fontPosition.y = GetScreenHeight()/2 - 20/2 - 40;
+    DrawTextEx(GetFontDefault(), state.c_str(), fontPosition, 20, 1, BLACK);
     EndDrawing();
-}
-
-
-
-
-
-
-void Board::checkControlledSquares(const std::string& color) {
-    whiteKingDoNotMove.clear();
-    blackKingDoNotMove.clear();
-
-    Piece* king;
-    if (color == "white") {
-        king = whiteKing;
-    } else {
-        king = blackKing;
-    }
-
-    for (const auto& pair : pieces) {
-        const auto& i = pair.second;
-        if (i == nullptr) {
-            continue;
-        } else if (i->color != color && typeid(*i) != typeid(King)) {
-            for (const auto& j : i->getPotentialMoves()) {
-                if (color == "white") {
-                    whiteKingDoNotMove.push_back(j);
-                } else {
-                    blackKingDoNotMove.push_back(j);
-                }
-            }
-        }
-    }
+    EndScissorMode();
 }
 
 bool Board::checkIfPieceProtected(Piece* p) {
@@ -217,7 +158,7 @@ bool Board::checkIfPieceProtected(Piece* p) {
         if (i == nullptr) {
             continue;
         } else if (i->color == p->color) {
-            for (const auto& j : i->getPotentialMoves()) {
+            for (const auto& j : i->getMoves( pieces)) {
                 if (j == p->position) {
                     return true;
                 }
@@ -226,9 +167,10 @@ bool Board::checkIfPieceProtected(Piece* p) {
     }
 }
 
+
+// Game state functions
 bool Board::checkForCheck(std::string color) {
     std::vector<int> moves_block_check;
-    std::vector<int> doNotGoKing;
     bool check = false;
     int king_pos = findKing(color);
 
@@ -242,64 +184,83 @@ bool Board::checkForCheck(std::string color) {
             continue;
         }
         if (piece->color != color && !dynamic_cast<King*>(piece)) {
-            // check if the piece is a pawn
             std::list<int> piece_moves;
             if (dynamic_cast<Pawn*>(piece)) {
-                // check if white or black
-                if (piece->color == w) {
-                    if (piece->position == blackKing->position + 7 || piece->position == blackKing->position + 9) {
+                if (piece->color == "white") {
+                    if (piece->position - 7 == blackKing->position|| piece->position - 9 == blackKing->position) {
                         check = true;
-                        piece_moves = {blackKing->position + 7, blackKing->position + 9};
+                        break;
                     }
                 } else {
-                    if (piece->position == whiteKing->position - 7 || piece->position == whiteKing->position - 9) {
+                    if (piece->position + 7 == whiteKing->position || piece->position + 9 == whiteKing->position) {
                         check = true;
-                        piece_moves = {whiteKing->position - 7, whiteKing->position - 9};
+                        break;
                     }
                 }
             } else {
-                piece_moves = piece->getMoves();
+                piece_moves = piece->getMoves(pieces);
             }
             for (int move : piece_moves) {
                 if (move == king_pos) {
                     check = true;
                     moves_block_check.push_back(i);
-                    doNotGoKing.push_back(move);
                     std::vector<int> line_of_attack = getLineOfAttack(i, king_pos);
                     for (int j : line_of_attack) {
                         moves_block_check.push_back(j);
-                        doNotGoKing.push_back(j);
                     }
-                    break;  // No need to check further moves for this piece
-                } else {
-                    doNotGoKing.push_back(move);
                 }
             }
             moves_block_check.push_back(piece->position);
-            // check if piece is the piece who gives the check is protected
-            if (checkIfPieceProtected(piece)) {
-                doNotGoKing.push_back(piece->position);
-            }
         }
+
     }
 
-    if (check == true) {
-        movesThatBlockCheck = moves_block_check;
-        if (color == std::string("white")) {
-            whiteKingDoNotMove = doNotGoKing;
-        } else {
-            blackKingDoNotMove = doNotGoKing;
-        }
 
+    if (check) {
+        movesThatBlockCheck = moves_block_check;
         return true;
     }
 
     return false;
 }
 
+bool Board::checkForStalemate(std::string color) {
+    // Check if the current player's king is in check
+    if (checkForCheck(color)) {
+        return false;  // The king is in check, not a stalemate
+    }
+
+    // Iterate over all pieces of the current player's color
+    for (const auto& pair : pieces) {
+        Piece* piece = pair.second;
+        if (!piece || piece->color != color) {
+            continue;
+        }
+
+        // Get all possible moves for the current piece
+        std::list<int> pieceMoves = piece->getMoves(pieces);
+
+        // Try each move and check if it results in the king being in check
+        for (int move : pieceMoves) {
+            // Make a copy of the current board state
+            std::map<int, Piece*> tempPieces = pieces;
+            tempPieces[piece->position] = nullptr;
+            tempPieces[move] = piece;
+            int oldPos = piece->position;
+            piece->position = move;
+            // Check if the move puts the king in check
+            if (!checkForCheckInPosition(tempPieces, color)) {
+                piece->position = oldPos;
+                return false;  // The move prevents stalemate, not a stalemate
+            }
+            piece->position = oldPos;
+        }
+    }
+
+    return true;  // Stalemate condition reached
+}
+
 bool Board::checkForCheckInPosition(std::map<int, Piece*> pieces1, std::string color) {
-    std::vector<int> moves_block_check;
-    std::vector<int> doNotGoKing;
     int king_pos = findKing(color);
     bool hitking = false;
 
@@ -307,25 +268,37 @@ bool Board::checkForCheckInPosition(std::map<int, Piece*> pieces1, std::string c
         return false;
     }
 
-    for (int i = 0; i < 64; i++) {
-        Piece* piece = pieces1[i];
+    for (const auto& pair : pieces1) {
+        int i = pair.first;
+        Piece*piece = pair.second;
         if (!piece) {
             continue;
         }
-        if (piece->color != color && !dynamic_cast<King*>(piece)) {
-            std::list<int> piece_moves = piece->getMoves();
-            for (int move : piece_moves) {
-                if (move == king_pos) {
-                    hitking = true;
-                    std::vector<int> line_of_attack = getLineOfAttack(i, king_pos);
-                    for (int j : line_of_attack) {
-                        moves_block_check.push_back(j);
+        if (piece->color != color) {
+            if (dynamic_cast<Pawn*>(piece)) {
+                if (piece->color == "white") {
+                    if (piece->position - 7 == blackKing->position|| piece->position - 9 == blackKing->position) {
+                        hitking = true;
+                        break;
                     }
-                    break;  // No need to check further moves for this piece
+                } else {
+                    if (piece->position + 7 == whiteKing->position || piece->position + 9 == whiteKing->position) {
+                        hitking = true;
+                        break;
+                    }
+                }
+            } else {
+                std::list<int> piece_moves = piece->getMoves(pieces1);
+                for (int move : piece_moves) {
+                    if (move == king_pos) {
+                        hitking = true;
+                        break;  // No need to check further moves for this piece
+                    }
                 }
             }
         }
     }
+
     if (hitking) {
         return true;
     }
@@ -333,42 +306,120 @@ bool Board::checkForCheckInPosition(std::map<int, Piece*> pieces1, std::string c
     return false;
 }
 
-
 bool Board::checkForCheckmate(std::string color) {
     if (checkForCheck(color)) {
-        // if check loop through all friendly pieces can block the check
+        if (turn == "white") {
+            whiteKing->check = true;
+        } else {
+            blackKing->check = true;
+        }
         for (const auto& pair : pieces) {
             const auto& i = pair.second;
-            if (i == nullptr) {
+            if (i == nullptr || i->color != color) {
                 continue;
-            } else if (i->color == color) {
-                std::list<int> piece_moves = i->getMoves();
-                for (int move : piece_moves) {
-                    // now try to make the move and parse that position to the checkForCheckInPosition function
-                    std::map<int, Piece*> pieces1 = pieces;
-                    pieces1[move] = pieces1[i->position];
-                    pieces1[i->position] = nullptr;
-                    if (!checkForCheckInPosition(pieces1, color)) {
-                        return false;
-                    }
+            }
+
+            std::list<int> piece_moves = i->getMoves(pieces);
+            for (int move : piece_moves) {
+                std::map<int, Piece*> pieces1 = pieces;
+                pieces1[move] = pieces1[i->position];
+                pieces1[i->position] = nullptr;
+                int oldPos = i->position;
+                i->position = move;
+                if (!checkForCheckInPosition(pieces1, color)) {
+                    i->position = oldPos;
+                    return false;
                 }
+                i->position = oldPos;
             }
         }
         return true;
     }
+
     return false;
 }
 
-bool Board::canAttack(int pos1, int pos2) {
-    Piece* piece = pieces[pos1];
-    if (!piece) {
-        return false;
-    }
-    std::list<int> potential_moves1 = piece->getPotentialMoves();
-    std::vector<int> potential_moves(potential_moves1.begin(), potential_moves1.end());
-
-    return std::find(potential_moves.begin(), potential_moves.end(), pos2) != potential_moves.end();
+// Helper functions
+int Board::getPosition(int row, int column) {
+    return row * 8 + column;
 }
+
+std::vector<int> Board::getAllBlackMoves() {
+    std::vector<int> moves;
+    for (const auto& pair : pieces) {
+        std::list<int> piece_moves;
+        const auto& i = pair.second;
+        if (i == nullptr || i->color != "black") {
+            continue;
+        }
+        if (i->name == "pawn") {
+            piece_moves = { i->position + 7, i->position + 9 };
+        } else {
+            piece_moves = i->getMoves(pieces);
+        }
+        for (int move : piece_moves) {
+            moves.push_back(move);
+        }
+    }
+    return moves;
+}
+
+std::vector<int> Board::getAllWhiteMoves() {
+    std::vector<int> moves;
+    for (const auto& pair : pieces) {
+        std::list<int> piece_moves;
+        const auto& i = pair.second;
+        if (i == nullptr || i->color != "white") {
+            continue;
+        }
+        if (i->name == "pawn") {
+            piece_moves = { i->position + 7, i->position + 9 };
+        } else {
+            piece_moves = i->getMoves(pieces);
+        }
+        for (int move : piece_moves) {
+            moves.push_back(move);
+        }
+    }
+    return moves;
+}
+
+void Board::promotePawn(Piece* pawn) {
+    BeginScissorMode(clippingRect.x, clippingRect.y, clippingRect.width, clippingRect.height);
+    promoting = true;
+    if (pawn->color == "white") {
+
+        BeginDrawing();
+            DrawRectangle(getColumn(pawn->position) * 82.5, 0, 83, 4 * 82.5, GRAY);
+            renderPiece("queen-white", getColumn(pawn->position) * 82.5, 0);
+            renderPiece("rook-white", getColumn(pawn->position) * 82.5, 82.5);
+            renderPiece("bishop-white", getColumn(pawn->position) * 82.5, 2 * 82.5);
+            renderPiece("knight-white", getColumn(pawn->position) * 82.5, 3 * 82.5);
+            // add all the
+        EndDrawing();
+        // add all the promoting pieces positions
+        promotionPosition.insert(std::make_pair("queen-white", getPosition(0, getColumn(pawn->position))));
+        promotionPosition.insert(std::make_pair("rook-white", getPosition(1, getColumn(pawn->position))));
+        promotionPosition.insert(std::make_pair("bishop-white", getPosition(3, getColumn(pawn->position))));
+        promotionPosition.insert(std::make_pair("knight-white", getPosition(4, getColumn(pawn->position))));
+    } else {
+        BeginDrawing();
+            DrawRectangle(getColumn(pawn->position) * 82.5, 650 - (4 * 82.5), 83, 4 * 82.5, GRAY);
+            renderPiece("queen-black", getColumn(pawn->position) * 82.5, 650 - 82.5);
+            renderPiece("rook-black", getColumn(pawn->position) * 82.5, 650 - (2*82.5));
+            renderPiece("bishop-black", getColumn(pawn->position) * 82.5, 650 - (3*82.5));
+            renderPiece("knight-black", getColumn(pawn->position) * 82.5, 650 - (4*82.5));
+
+        EndDrawing();
+        // add all the promoting pieces positions
+        promotionPosition.insert(std::make_pair("queen-black", getPosition(7, getColumn(pawn->position))));
+        promotionPosition.insert(std::make_pair("rook-black", getPosition(6, getColumn(pawn->position))));
+        promotionPosition.insert(std::make_pair("bishop-black", getPosition(5, getColumn(pawn->position))));
+        promotionPosition.insert(std::make_pair("knight-black", getPosition(4, getColumn(pawn->position))));
+    }
+    EndScissorMode();
+}
+
 
 std::vector<int> Board::getLineOfAttack(int pos1, int pos2) {
     std::vector<int> line_of_attack;
@@ -392,6 +443,26 @@ std::vector<int> Board::getLineOfAttack(int pos1, int pos2) {
     return line_of_attack;
 }
 
+int Board::getColumn(int pos) {
+    // find the passed pos in the rows map
+    for (const auto& pair : columns) {
+        const auto& i = pair.second;
+        if (std::find(i.begin(), i.end(), pos) != i.end()) {
+            return pair.first;
+        }
+    }
+}
+
+int Board::getRow(int pos) {
+    // find the passed pos in the rows map
+    for (const auto& pair : rows) {
+        const auto& i = pair.second;
+        if (std::find(i.begin(), i.end(), pos) != i.end()) {
+            return pair.first;
+        }
+    }
+}
+
 int Board::findKing(std::string color) {
     if (color == w) {
         return whiteKing->position;
@@ -401,26 +472,6 @@ int Board::findKing(std::string color) {
     return -1;
 }
 
-bool Board::isPinned(int pos) {
-    Piece* piece = pieces[pos];
-    if (!piece) {
-        return false;
-    }
-    std::string color = piece->color;
-    int king_pos = findKing(color);
-    if (king_pos == -1) {
-        return false;
-    }
-    if (canAttack(pos, king_pos)) {
-        std::vector<int> line_of_attack = getLineOfAttack(pos, king_pos);
-        for (int i : line_of_attack) {
-            if (i != pos && pieces[i]) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
 
 bool Board::isLegalMove(int from, int to) {
     // Check if the move is valid according to the specific game rules
@@ -465,38 +516,45 @@ std::vector<int> Board::getSquaresBetween(int pos1, int pos2) {
     return squares_between;
 }
 
-
-
-void Board::initBoard() {
+void Board::initBoard()
+{
+    BeginScissorMode(clippingRect.x, clippingRect.y, clippingRect.width, clippingRect.height);
     BeginDrawing();
 
-        ClearBackground(RED);
+    ClearBackground(RED);
 
-        // loop 64 times to draw the chess board
-        int i = 0;
-        int j = 0;
-        for (int y = 0; y < 8; y++) {
-            for (int x = 0; x < 8; x++) {
-                // draw a square
-                // if i is even, draw a white square
-                // if i is odd, draw a black square
-                if (x % 2 == i) {
-                    DrawRectangle(x * 82.5, y * 82.5, (82.5 * x) + 82.5, (82.5 * y) + 82.5, WHITE);
-                } else {
-                    DrawRectangle(x * 82.5, y * 82.5, (82.5 * x) + 82.5, (82.5 * y) + 82.5, DARKBROWN);
-                }
-                // add the positions of each square to the board
-                array<int, 2> position = {82.5 * x, 82.5 * y};
-                boardPositions.insert(std::make_pair(j, position));
-                j++;
+    // loop 64 times to draw the chess board
+    int i = 0;
+    int j = 0;
+    for (int y = 0; y < 8; y++)
+    {
+        for (int x = 0; x < 8; x++)
+        {
+            // draw a square
+            // if i is even, draw a white square
+            // if i is odd, draw a black square
+            if (x % 2 == i)
+            {
+                DrawRectangle(clippingRect.x + x * 82.5, clippingRect.y + y * 82.5, clippingRect.x + (82.5 * x) + 82.5, clippingRect.y + (82.5 * y) + 82.5, WHITE);
             }
-            if (i == 1) {
-                i = 0;
-            } else {
-                i = 1;
+            else
+            {
+                DrawRectangle(clippingRect.x + x * 82.5, clippingRect.y + y * 82.5, clippingRect.x + (82.5 * x) + 82.5, clippingRect.y + (82.5 * y) + 82.5, DARKBROWN);
             }
-
+            // add the positions of each square to the board
+            std::array<int, 2> position = { clippingRect.x + 82.5 * x, clippingRect.y + 82.5 * y };
+            boardPositions.insert(std::make_pair(j, position));
+            j++;
         }
+        if (i == 1)
+        {
+            i = 0;
+        }
+        else
+        {
+            i = 1;
+        }
+    }
 
     EndDrawing();
     std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
@@ -504,85 +562,95 @@ void Board::initBoard() {
 
     setup.addFenToSetup(fen);
     fen = "";
-    for (auto const& piece : setup.pieces) {
-        // call fenNameToPiece to get the piece class
-
+    for (auto const& piece : setup.pieces)
+    {
         // pieces = map<string, list<int>>, piece.first is the fenName and piece.second is the position array, so loop through the positions and draw the pieces
-        for (auto const& pos : piece.second) {
+        for (auto const& pos : piece.second)
+        {
             fenNameToPiece(piece.first[0], pos);
-
         }
-
-
     }
 
     // add all the pieces to the board, and NULL value for empty squares
     BeginDrawing();
-    for (auto piece : pieces) {
-
-
+    for (auto piece : pieces)
+    {
         std::array<int, 2> position;
-        try {
+        try
+        {
             position = boardPositions.at(piece.second->position);
-        } catch (const std::out_of_range& e) {
+        }
+        catch (const std::out_of_range& e)
+        {
             // Handle the case where the position is not found in the map
             // *this could be due to an incorrect position value or an empty map
             // You might want to add appropriate error handling here
             continue;
         }
 
-
-        if (piece.second == nullptr) {
+        if (piece.second == nullptr)
+        {
             continue;
         }
 
-
-
-        if (piece.second->name.empty()) {
+        if (piece.second->name.empty())
+        {
             continue;
         }
 
         const std::string& fenName = std::string(piece.second->name) + "-" + std::string(fenNameToColor(piece.second->fenName));
         renderPiece(fenName, position[0], position[1]);
-
-
     }
     EndDrawing();
+    EndScissorMode();
 }
 
-void Board::drawBoard() {
+void Board::drawBoard()
+{
+    BeginScissorMode(clippingRect.x, clippingRect.y, clippingRect.width, clippingRect.height);
     BeginDrawing();
-        ClearBackground(RED);
+    
+    ClearBackground(RED);
 
-        // loop 64 times to draw the chess board
-        int i = 0;
-        int j = 0;
-        for (int y = 0; y < 8; y++) {
-            for (int x = 0; x < 8; x++) {
-                // draw a square
-                // if i is even, draw a white square
-                // if i is odd, draw a black square
-                if (x % 2 == i) {
-                    DrawRectangle(x * 82.5, y * 82.5, (82.5 * x) + 82.5, (82.5 * y) + 82.5, WHITE);
-                } else {
-                    DrawRectangle(x * 82.5, y * 82.5, (82.5 * x) + 82.5, (82.5 * y) + 82.5, DARKBROWN);
-                }
-                if (pieces[j] != nullptr) {
-                    std::array<int, 2> position = boardPositions.at(j);
-                    const std::string& fenName = std::string(pieces[j]->name) + "-" + std::string(fenNameToColor(pieces[j]->fenName));
-                    renderPiece(fenName, position[0], position[1]);
-                }
-
-                j++;
+    // loop 64 times to draw the chess board
+    int i = 0;
+    int j = 0;
+    for (int y = 0; y < 8; y++)
+    {
+        for (int x = 0; x < 8; x++)
+        {
+            // draw a square
+            // if i is even, draw a white square
+            // if i is odd, draw a black square
+            if (x % 2 == i)
+            {
+                DrawRectangle(clippingRect.x + x * 82.5, clippingRect.y + y * 82.5, clippingRect.x + (82.5 * x) + 82.5, clippingRect.y + (82.5 * y) + 82.5, WHITE);
             }
-            if (i == 1) {
-                i = 0;
-            } else {
-                i = 1;
+            else
+            {
+                DrawRectangle(clippingRect.x + x * 82.5, clippingRect.y + y * 82.5, clippingRect.x + (82.5 * x) + 82.5, clippingRect.y + (82.5 * y) + 82.5, DARKBROWN);
+            }
+            if (pieces[j] != nullptr)
+            {
+                std::array<int, 2> position = boardPositions.at(j);
+                const std::string& fenName = std::string(pieces[j]->name) + "-" + std::string(fenNameToColor(pieces[j]->fenName));
+                renderPiece(fenName, position[0], position[1]);
             }
 
+            j++;
         }
+        if (i == 1)
+        {
+            i = 0;
+        }
+        else
+        {
+            i = 1;
+        }
+    }
+
     EndDrawing();
+    EndScissorMode();
 }
 
 void Board::mouseLeftClick(Vector2 mousePoint) {
@@ -597,36 +665,111 @@ void Board::mouseLeftClick(Vector2 mousePoint) {
         }
     }
 
+    bool p = promoting;
+    if (promoting) {
+        for (auto const& position : promotionPosition) {
+            if (position.second == clickedSquare) {
+                if (position.first == "queen-white") {
+                    char piece = "q"[0];
+                   fenNameToPiece(piece, clickedSquare);
+                } else if (position.first == "rook-white") {
+                    char piece = "r"[0];
+                    fenNameToPiece(piece, clickedSquare);
+                } else if (position.first == "bishop-white") {
+                    char piece = "b"[0];
+                    fenNameToPiece(piece, clickedSquare);
+                } else if (position.first == "knight-white") {
+                    char piece = "n"[0];
+                    fenNameToPiece(piece, clickedSquare);
+                } else if (position.first == "queen-black") {
+                    char piece = "Q"[0];
+                    fenNameToPiece(piece, clickedSquare);
+                } else if (position.first == "rook-black") {
+                    char piece = "R"[0];
+                    fenNameToPiece(piece, clickedSquare);
+                } else if (position.first == "bishop-black") {
+                    char piece = "B"[0];
+                    fenNameToPiece(piece, clickedSquare);
+                } else if (position.first == "knight-black") {
+                    char piece = "N"[0];
+                    fenNameToPiece(piece, clickedSquare);
+                }
+                drawBoard();
+                promoting = false;
+                promotionPosition.clear();
+                whiteKing->check = false;
+                blackKing->check = false;
+                whiteKingDoNotMove.clear();
+                blackKingDoNotMove.clear();
+                whiteKingDoNotMove = getAllBlackMoves();
+                blackKingDoNotMove = getAllWhiteMoves();
+                if (turn == w) {
+                    turn = b;
+                } else {
+                    turn = w;
+                }
+
+                potentialMoves.clear();
+                selectedPiece = nullptr;
+                drawBoard();
+                bool checkmate = checkForCheckmate(turn);
+                if (checkmate) {
+                    endGame("Checkmate");
+                    return;
+                } else {
+                    bool stalemated = checkForStalemate(turn);
+                    if (stalemated) {
+                        endGame("Stalemate");
+                        return;
+                    }
+                }
+
+                return;
+            }
+        }
+
+    }
+
     if (clickedSquare == -1) {
         return;
     }
 
     // check if the clickedSquare is in the pieces list
     if (std::find(potentialMoves.begin(), potentialMoves.end(), clickedSquare) != potentialMoves.end()) {
+
         // reset both checks
         whiteKing->check = false;
         blackKing->check = false;
+        whiteKingDoNotMove.clear();
+        blackKingDoNotMove.clear();
+        whiteKingDoNotMove = getAllBlackMoves();
+        blackKingDoNotMove = getAllWhiteMoves();
         selectedPiece->makeMove(clickedSquare);
+        if (promoting == true && p == false) {
+            // check if user clicked in one of promotionPosition
+            return;
+        }
         if (turn == w) {
             turn = b;
         } else {
             turn = w;
         }
-        bool check = checkForCheck(turn);
-        std::cout << "check: " << check << std::endl;
-        if (turn == "white") {
-            whiteKing->check = check;
-        } else {
-            blackKing->check = check;
-        }
+
         potentialMoves.clear();
         selectedPiece = nullptr;
         drawBoard();
         bool checkmate = checkForCheckmate(turn);
         if (checkmate) {
-            endGame();
+            endGame("Checkmate");
             return;
+        } else {
+            bool stalemated = checkForStalemate(turn);
+            if (stalemated) {
+                endGame("Stalemate");
+                return;
+            }
         }
+
         return;
     }
 
@@ -640,6 +783,6 @@ void Board::mouseLeftClick(Vector2 mousePoint) {
     }
 
     // get the piece and call the move function
-    pieces[clickedSquare]->move();
+    pieces[clickedSquare]->move(pieces);
 
 }

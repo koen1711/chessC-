@@ -5,8 +5,12 @@ file(REMOVE_RECURSE
   "CMakeFiles/myGame.dir/board.cpp.o.d"
   "CMakeFiles/myGame.dir/main.cpp.o"
   "CMakeFiles/myGame.dir/main.cpp.o.d"
+  "CMakeFiles/myGame.dir/mainmenu.cpp.o"
+  "CMakeFiles/myGame.dir/mainmenu.cpp.o.d"
   "CMakeFiles/myGame.dir/pieces.cpp.o"
   "CMakeFiles/myGame.dir/pieces.cpp.o.d"
+  "CMakeFiles/myGame.dir/settings.cpp.o"
+  "CMakeFiles/myGame.dir/settings.cpp.o.d"
   "CMakeFiles/myGame.dir/setup.cpp.o"
   "CMakeFiles/myGame.dir/setup.cpp.o.d"
 )

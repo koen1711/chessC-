@@ -178,6 +178,30 @@ main.cpp.s:
 	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+mainmenu.o: mainmenu.cpp.o
+.PHONY : mainmenu.o
+
+# target to build an object file
+mainmenu.cpp.o:
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/mainmenu.cpp.o
+.PHONY : mainmenu.cpp.o
+
+mainmenu.i: mainmenu.cpp.i
+.PHONY : mainmenu.i
+
+# target to preprocess a source file
+mainmenu.cpp.i:
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/mainmenu.cpp.i
+.PHONY : mainmenu.cpp.i
+
+mainmenu.s: mainmenu.cpp.s
+.PHONY : mainmenu.s
+
+# target to generate assembly for a file
+mainmenu.cpp.s:
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/mainmenu.cpp.s
+.PHONY : mainmenu.cpp.s
+
 pieces.o: pieces.cpp.o
 .PHONY : pieces.o
 
@@ -201,6 +225,30 @@ pieces.s: pieces.cpp.s
 pieces.cpp.s:
 	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/pieces.cpp.s
 .PHONY : pieces.cpp.s
+
+settings.o: settings.cpp.o
+.PHONY : settings.o
+
+# target to build an object file
+settings.cpp.o:
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/settings.cpp.o
+.PHONY : settings.cpp.o
+
+settings.i: settings.cpp.i
+.PHONY : settings.i
+
+# target to preprocess a source file
+settings.cpp.i:
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/settings.cpp.i
+.PHONY : settings.cpp.i
+
+settings.s: settings.cpp.s
+.PHONY : settings.s
+
+# target to generate assembly for a file
+settings.cpp.s:
+	cd /home/koen/Documents/GitHub/chessC- && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/myGame.dir/build.make src/CMakeFiles/myGame.dir/settings.cpp.s
+.PHONY : settings.cpp.s
 
 setup.o: setup.cpp.o
 .PHONY : setup.o
@@ -241,9 +289,15 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... mainmenu.o"
+	@echo "... mainmenu.i"
+	@echo "... mainmenu.s"
 	@echo "... pieces.o"
 	@echo "... pieces.i"
 	@echo "... pieces.s"
+	@echo "... settings.o"
+	@echo "... settings.i"
+	@echo "... settings.s"
 	@echo "... setup.o"
 	@echo "... setup.i"
 	@echo "... setup.s"

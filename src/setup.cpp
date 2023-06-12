@@ -3,8 +3,6 @@
 #include <string>
 #include <array>
 
-using namespace std;
-
 void Setup::addFenToSetup(std::string fen) {
     std::map<std::string, std::list<int>> piecePositions;
     size_t spacePos = fen.find(' ');
