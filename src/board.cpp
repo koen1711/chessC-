@@ -671,28 +671,28 @@ void Board::mouseLeftClick(Vector2 mousePoint) {
             if (position.second == clickedSquare) {
                 if (position.first == "queen-white") {
                     char piece = "q"[0];
-                   fenNameToPiece(piece, clickedSquare);
+                   fenNameToPiece(piece, getPosition(0, getColumn(clickedSquare)));
                 } else if (position.first == "rook-white") {
                     char piece = "r"[0];
-                    fenNameToPiece(piece, clickedSquare);
+                    fenNameToPiece(piece, getPosition(0, getColumn(clickedSquare)));
                 } else if (position.first == "bishop-white") {
                     char piece = "b"[0];
-                    fenNameToPiece(piece, clickedSquare);
+                    fenNameToPiece(piece, getPosition(0, getColumn(clickedSquare)));
                 } else if (position.first == "knight-white") {
                     char piece = "n"[0];
-                    fenNameToPiece(piece, clickedSquare);
+                    fenNameToPiece(piece, getPosition(0, getColumn(clickedSquare)));
                 } else if (position.first == "queen-black") {
                     char piece = "Q"[0];
-                    fenNameToPiece(piece, clickedSquare);
+                    fenNameToPiece(piece, getPosition(7, getColumn(clickedSquare)));
                 } else if (position.first == "rook-black") {
                     char piece = "R"[0];
-                    fenNameToPiece(piece, clickedSquare);
+                    fenNameToPiece(piece, getPosition(7, getColumn(clickedSquare)));
                 } else if (position.first == "bishop-black") {
                     char piece = "B"[0];
-                    fenNameToPiece(piece, clickedSquare);
+                    fenNameToPiece(piece, getPosition(7, getColumn(clickedSquare)));
                 } else if (position.first == "knight-black") {
                     char piece = "N"[0];
-                    fenNameToPiece(piece, clickedSquare);
+                    fenNameToPiece(piece, getPosition(7, getColumn(clickedSquare)));
                 }
                 drawBoard();
                 promoting = false;
