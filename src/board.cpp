@@ -400,8 +400,8 @@ void Board::promotePawn(Piece* pawn) {
         // add all the promoting pieces positions
         promotionPosition.insert(std::make_pair("queen-white", getPosition(0, getColumn(pawn->position))));
         promotionPosition.insert(std::make_pair("rook-white", getPosition(1, getColumn(pawn->position))));
-        promotionPosition.insert(std::make_pair("bishop-white", getPosition(3, getColumn(pawn->position))));
-        promotionPosition.insert(std::make_pair("knight-white", getPosition(4, getColumn(pawn->position))));
+        promotionPosition.insert(std::make_pair("bishop-white", getPosition(2, getColumn(pawn->position))));
+        promotionPosition.insert(std::make_pair("knight-white", getPosition(3, getColumn(pawn->position))));
     } else {
         BeginDrawing();
             DrawRectangle(getColumn(pawn->position) * 82.5, 650 - (4 * 82.5), 83, 4 * 82.5, GRAY);
@@ -676,9 +676,11 @@ void Board::mouseLeftClick(Vector2 mousePoint) {
                     char piece = "r"[0];
                     fenNameToPiece(piece, getPosition(0, getColumn(clickedSquare)));
                 } else if (position.first == "bishop-white") {
+                    std::cout << "bishop-white" << std::endl;
                     char piece = "b"[0];
                     fenNameToPiece(piece, getPosition(0, getColumn(clickedSquare)));
                 } else if (position.first == "knight-white") {
+                    std::cout << "knight-white" << std::endl;
                     char piece = "n"[0];
                     fenNameToPiece(piece, getPosition(0, getColumn(clickedSquare)));
                 } else if (position.first == "queen-black") {

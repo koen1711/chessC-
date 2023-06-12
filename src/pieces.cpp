@@ -315,10 +315,12 @@ void Pawn::makeMove(int pos) {
     }
 
     // check if there is a piece left or right of the pawn for en passant
-    if (board.pieces[pos -1 ] != nullptr && board.pieces[pos -1 ]->color != color && board.pieces[pos -1 ]->enPassantRight == false) {
-        board.pieces[pos -1 ]->enPassantRight = true;
-    } else if (board.pieces[pos +1 ] != nullptr && board.pieces[pos +1 ]->color != color && board.pieces[pos +1 ]->enPassantLeft == false) {
-        board.pieces[pos +1 ]->enPassantLeft = true;
+    if (pos == position - 16 || pos == position + 16) {
+        if (board.pieces[pos -1 ] != nullptr && board.pieces[pos -1 ]->color != color && board.pieces[pos -1 ]->enPassantRight == false) {
+            board.pieces[pos -1 ]->enPassantRight = true;
+        } else if (board.pieces[pos +1 ] != nullptr && board.pieces[pos +1 ]->color != color && board.pieces[pos +1 ]->enPassantLeft == false) {
+            board.pieces[pos +1 ]->enPassantLeft = true;
+        }
     }
     int oldPos = position;
     if ((pos == oldPos - 7 || pos == oldPos - 9 || pos == oldPos + 7 || pos == oldPos + 9) && (enPassantLeft == true || enPassantRight == true)) {
