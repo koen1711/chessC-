@@ -251,8 +251,9 @@ bool Board::checkForStalemate(std::string color) {
             // Check if the move puts the king in check
             if (!checkForCheckInPosition(tempPieces, color)) {
                 piece->position = oldPos;
-                return false;  // The move prevents stalemate, not a stalemate
+                return false;
             }
+            delete &tempPieces;
             piece->position = oldPos;
         }
     }
@@ -330,6 +331,7 @@ bool Board::checkForCheckmate(std::string color) {
                     i->position = oldPos;
                     return false;
                 }
+                delete &pieces1;
                 i->position = oldPos;
             }
         }
@@ -609,7 +611,20 @@ void Board::drawBoard()
 {
     BeginScissorMode(clippingRect.x, clippingRect.y, clippingRect.width, clippingRect.height);
     BeginDrawing();
-    
+    // unload all the old textures
+    UnloadTexture(WhitePawnTexture);
+    UnloadTexture(WhiteKnightTexture);
+    UnloadTexture(WhiteBishopTexture);
+    UnloadTexture(WhiteRookTexture);
+    UnloadTexture(WhiteQueenTexture);
+    UnloadTexture(WhiteKingTexture);
+    UnloadTexture(BlackPawnTexture);
+    UnloadTexture(BlackKnightTexture);
+    UnloadTexture(BlackBishopTexture);
+    UnloadTexture(BlackRookTexture);
+    UnloadTexture(BlackQueenTexture);
+    UnloadTexture(BlackKingTexture);
+
     ClearBackground(RED);
 
     // loop 64 times to draw the chess board
@@ -786,5 +801,4 @@ void Board::mouseLeftClick(Vector2 mousePoint) {
 
     // get the piece and call the move function
     pieces[clickedSquare]->move(pieces);
-
 }

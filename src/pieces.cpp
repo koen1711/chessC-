@@ -290,6 +290,7 @@ std::list<int> King::getMoves(std::map<int, Piece*> pieces) {
         }
     }
 
+    kingMoves = validMoves2;
 
     return kingMoves;
 }

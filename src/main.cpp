@@ -70,12 +70,17 @@ int main(int argc, const char* args[]) {
                         board[0].clippingRect = { (GetScreenWidth() - 650) / 2, (GetScreenHeight() - 650) / 2, 650, 650};
                     }
                     board[0].initBoard();
+                    // remove the main menu from memory
+                    mainMenu.pop_back();
                 }
                 if (mainMenu[0].openSettings) {
                     // if the settings button was pressed then open the settings menu
                     settings.push_back(Settings());
-                    mainMenu.pop_back();
+                    // remove the main menu from memory
+                    delete &mainMenu[0];
+                    mainMenu = {};
                     settings[0].drawSettingsMenu();
+
                 }
             } else if (settings.size() > 0) {
                 BeginDrawing();
@@ -86,9 +91,12 @@ int main(int argc, const char* args[]) {
                 if (settings[0].goBack) {
                     // if the back button was pressed then go back to the main menu
                     mainMenu.push_back(MainMenu());
-                    settings.pop_back();
+                    settings = {};
                     mainMenu[0].drawMainMenu();
+                } else {
+                    settings[0].drawSettingsMenu();
                 }
+
             }
         }
 
