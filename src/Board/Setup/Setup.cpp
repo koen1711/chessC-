@@ -1,4 +1,4 @@
-#include "setup.h"
+#include "Setup.h"
 #include <cstring>
 #include <string>
 #include <array>
@@ -41,5 +41,3 @@ void Setup::addFenToSetup(std::string fen) {
 
     pieces = result;
 }
-
-

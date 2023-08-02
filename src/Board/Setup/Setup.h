@@ -1,10 +1,10 @@
-#ifndef SETUP
-#define SETUP
+#ifndef CHESSGAME_SETUP_H
+#define CHESSGAME_SETUP_H
 
-#include "raylib.h"
 #include <map>
 #include <string>
 #include <list>
+#include "../../Pieces/Pieces.h"
 
 class Setup
 {
@@ -14,4 +14,4 @@ public:
     std::map<std::string, std::list<int>> pieces = {};
 };
 
-#endif
+#endif //CHESSGAME_SETUP_H

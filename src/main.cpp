@@ -1,134 +1,73 @@
-#include "raylib.h"
-#include "board.h"
-#include "mainmenu.h"
-#include "pieces.h"
-#include "settings.h"
+
+#include <raylib.h>
 #include <iostream>
 #include <chrono>
-#include <thread>
-#include <vector>
+#include "Board/Board.h"
+#include "Render/Renderer.h"
 
-#define screenWidth 650
-#define screenHeight 650
+int moveCount = 0;
 
-std::vector<Board> board;
-std::vector<MainMenu> mainMenu;
-std::vector<Settings> settings;
-bool inGame = false;
-
-
-int main(int argc, const char* args[]) {
-
-    // Initialization
-    //--------------------------------------------------------------------------------------
-    SetConfigFlags(FLAG_WINDOW_MAXIMIZED | FLAG_WINDOW_RESIZABLE);
-    InitWindow(screenWidth, screenHeight, "Chess in C++");
-
-    // set trace log level
-    SetTraceLogLevel(LOG_WARNING);
-    SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
-    //--------------------------------------------------------------------------------------
-
-    
-
-    Vector2 mousePoint = { 0.0f, 0.0f };
-    // if the first argument is true then start the game
-    if (argc > 1) {
-        if (std::string(args[1]) == "true") {
-            inGame = true;
-            board.push_back(Board());
-            board[0].clippingRect = { 0, 0, 650, 650 };
-            board[0].initBoard();
-        } else {
-            inGame = false;
-            mainMenu.push_back(MainMenu());
-            mainMenu[0].drawMainMenu();
-        }
-    } else {
-        inGame = false;
-        mainMenu.push_back(MainMenu());
-        mainMenu[0].drawMainMenu();
+void MoveGenerationTest(int depth, Board* board, Renderer* renderer)
+{
+    if (depth == 0) {
+        return;
     }
-    while (!WindowShouldClose())    // Detect window close button or ESC key
-    {
-        mousePoint = GetMousePosition();
 
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            // if there is a board in board[0]
-            if (board.size() > 0) {
-                board[0].mouseLeftClick(mousePoint);
-            } else if (mainMenu.size() > 0) {
-                // make a main menu
-                mainMenu[0].mouseLeftClick(mousePoint);
-                if (mainMenu[0].startGame) {
-                    // if the start game button was pressed then start the game
-                    inGame = true;
-                    board.push_back(Board());
-                    if (GetScreenHeight() == 650) {
-                        board[0].clippingRect = { 0,0,650,650 };
-                    } else {
-                        board[0].clippingRect = { (GetScreenWidth() - 650) / 2, (GetScreenHeight() - 650) / 2, 650, 650};
-                    }
-                    board[0].initBoard();
-                    // remove the main menu from memory
-                    mainMenu.pop_back();
-                }
-                if (mainMenu[0].openSettings) {
-                    // if the settings button was pressed then open the settings menu
-                    settings.push_back(Settings());
-                    // remove the main menu from memory
-                    delete &mainMenu[0];
-                    mainMenu = {};
-                    settings[0].drawSettingsMenu();
+    std::map<int, Piece*> pieces = board->board;
+    std::string currentPlayerColor = board->turn == "white" ? "white" : "black";
 
-                }
-            } else if (settings.size() > 0) {
-                BeginDrawing();
-                ClearBackground(BLACK);
-                EndDrawing();
-                // make a settings menu
-                settings[0].mouseLeftButton(mousePoint);
-                if (settings[0].goBack) {
-                    // if the back button was pressed then go back to the main menu
-                    mainMenu.push_back(MainMenu());
-                    settings = {};
-                    mainMenu[0].drawMainMenu();
-                } else {
-                    settings[0].drawSettingsMenu();
-                }
+    for (const auto& pair : pieces) {
+        Piece* piece = pair.second;
 
+        if (piece == nullptr)
+            continue;
+        if (piece->color == currentPlayerColor) {
+            std::map<int, Move*> moves = piece->getMoves();
+            moveCount += moves.size();
+            for (std::pair move : moves) {
+                board->movePiece(*move.second);
+                //BeginDrawing();
+                //renderer->render();
+                //EndDrawing();
+                MoveGenerationTest(depth - 1, board, renderer);
+                board->undoMove(*move.second);
             }
         }
+    }
+}
 
+int main(int argc, char** argv)
+{
+    int screenWidth = 800;
+    int screenHeight = 800;
 
-        // check if there was a change in window size
-        if (IsWindowResized()) {
-            BeginDrawing();
-            ClearBackground(BLACK);
-            EndDrawing();
-            if (board.size() > 0) {
-                // if there is a board in board[0] then resize it
-                board[0].clippingRect = { (GetScreenWidth() - 650) / 2, (GetScreenHeight() - 650) / 2, 650, 650 };
-                board[0].drawBoard();
-            } else if (mainMenu.size() > 0) {
-                // if there is a main menu in mainMenu[0] then resize it
-                mainMenu[0].drawMainMenu();
-            } else if (settings.size() > 0) {
-                // if there is a settings menu in settings[0] then resize it
-                settings[0].drawSettingsMenu();
-            }
+    InitWindow(screenWidth, screenHeight, "Chess Game");
+    SetTargetFPS(60);
+
+    auto* board = new Board();
+    board->init();
+    auto* renderer = new Renderer(board);
+
+    Vector2 mousePosition = {0, 0};
+    for (int i = 1; i < 4; i++) {
+        // Start the timer
+        auto start = std::chrono::high_resolution_clock::now();
+        MoveGenerationTest(i, board, renderer);
+        std::cout << "Depth: " << i << " Move Count: " << moveCount << " Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() << "ms" << std::endl;
+        moveCount = 0;
+    }
+
+    while (!WindowShouldClose())
+    {
+        mousePosition = GetMousePosition();
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            board->handleClick(mousePosition);
         }
 
         BeginDrawing();
-
-
+            renderer->render();
         EndDrawing();
     }
-
-    // De-Initialization
-    //--------------------------------------------------------------------------------------
-    CloseWindow();        // Close window and OpenGL context
-    //--------------------------------------------------------------------------------------
 
     return 0;
 }
