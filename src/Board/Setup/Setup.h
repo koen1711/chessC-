@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 #include <list>
-#include "../../Pieces/Pieces.h"
+#include "../Pieces/Pieces.h"
 
 class Setup
 {

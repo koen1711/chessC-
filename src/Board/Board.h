@@ -1,17 +1,16 @@
 #ifndef CHESSGAME_BOARD_H
 #define CHESSGAME_BOARD_H
 
-#include "../Pieces/Pieces.h"
-#include "../GameLoop/GameLoop.h"
+#include "Pieces/Pieces.h"
+#include "GameLoop/GameLoop.h"
 #include "MoveGenerator/MoveGenerator.h"
 #include "Move/Move.h"
 #include "../Render/Renderer.h"
+#include "Types/Types.h"
 
 #include <raylib.h>
 #include <vector>
 #include <map>
-
-
 
 class MoveGenerator;
 
@@ -23,15 +22,13 @@ class Move;
 
 class Board {
 public:
-    MoveGenerator* moveGeneratorClass;
+    MoveGenerator* moveGenerator;
     GameLoop* gameLoopClass;
 
     bool inCheck = false;
-    std::string turn = "white";
+    ChessColor turn = ChessColor::COLORWHITE;
 
     Piece* activePiece = nullptr;
-    Piece* whiteKing;
-    Piece* blackKing;
 
     std::vector<int> movesThatBlockCheck;
 
@@ -56,19 +53,19 @@ public:
     bool blackRightCastle = true;
     bool blackLeftCastle = true;
 
-    std::map<std::string, std::vector<Piece*>> pawns;
-    std::map<std::string, std::vector<Piece*>> knights;
-    std::map<std::string, std::vector<Piece*>> bishops;
-    std::map<std::string, std::vector<Piece*>> rooks;
-    std::map<std::string, std::vector<Piece*>> queens;
-    std::map<std::string, std::vector<Piece*>> kings;
+    std::map<ChessColor, std::vector<Piece*>> pawns = {std::make_pair(ChessColor::COLORWHITE, std::vector<Piece*>()), std::make_pair(ChessColor::COLORBLACK, std::vector<Piece*>())};
+    std::map<ChessColor, std::vector<Piece*>> knights = {std::make_pair(ChessColor::COLORWHITE, std::vector<Piece*>()), std::make_pair(ChessColor::COLORBLACK, std::vector<Piece*>())};
+    std::map<ChessColor, std::vector<Piece*>> bishops = {std::make_pair(ChessColor::COLORWHITE, std::vector<Piece*>()), std::make_pair(ChessColor::COLORBLACK, std::vector<Piece*>())};
+    std::map<ChessColor, std::vector<Piece*>> rooks = {std::make_pair(ChessColor::COLORWHITE, std::vector<Piece*>()), std::make_pair(ChessColor::COLORBLACK, std::vector<Piece*>())};
+    std::map<ChessColor, std::vector<Piece*>> queens = {std::make_pair(ChessColor::COLORWHITE, std::vector<Piece*>()), std::make_pair(ChessColor::COLORBLACK, std::vector<Piece*>())};
+    std::map<ChessColor, std::vector<Piece*>> kings = {std::make_pair(ChessColor::COLORWHITE, std::vector<Piece*>()), std::make_pair(ChessColor::COLORBLACK, std::vector<Piece*>())};
 
     Board();
 
     void init();
 
     // GAMEPLAY FUNCTIONS
-    void movePiece(const Move& move);
+    void movePiece(Move* move);
     void undoMove(const Move& move);
     void removePiece(int position);
     void promotePawn(Piece* pawn);
@@ -78,6 +75,8 @@ public:
     void handleClick(Vector2 mousePosition);
 
 
+    bool checkmate;
+    std::vector<Piece*> pinnedPieces;
 };
 
 

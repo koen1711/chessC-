@@ -2,7 +2,7 @@
 #define CHESSGAME_MOVEGENERATOR_H
 
 #include "../Board.h"
-#include "../../Pieces/Pieces.h"
+#include "../Pieces/Pieces.h"
 #include <vector>
 #include <bitset>
 #include <algorithm>
@@ -11,16 +11,17 @@ class Board;
 
 class Piece;
 
+class Move;
+
 class MoveGenerator {
 public:
     // Constructor, initialization, and other public methods
     MoveGenerator(Board* board);
 
     void GenerateMoves();
-    bool InCheck();
-
 
     int moveSize;
+    std::vector<Move*> moves;
 private:
     Board* board;
 

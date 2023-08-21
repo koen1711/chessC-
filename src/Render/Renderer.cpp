@@ -1,7 +1,7 @@
 #include "Renderer.h"
 
 #include <raylib.h>
-#include <algorithm>
+#include <iostream>
 
 Renderer::Renderer(Board* board)
 {
@@ -25,14 +25,18 @@ void Renderer::drawBoard() {
         } else {
             DrawRectangle(x * 100, y * 100, 100, 100, DARKBROWN);
         }
+    }
 
-
-        if (std::find(board->potentialMoves.begin(), board->potentialMoves.end(), i) != board->potentialMoves.end()) {
-            if (board->board[i] != nullptr) {
-                DrawTextureEx(captureTexture, { (float)(x * 100), (float)(y * 100) }, 0, scaleOfImage, WHITE);
-            } else {
-                DrawTextureEx(potentialMoveTexture, { (float)(x * 100), (float)(y * 100) }, 0, scaleOfImage, WHITE);
-            }
+    for (const auto& entry : board->potentialMoves) {
+        if (entry.second == nullptr) {
+            continue;
+        }
+        int x = entry.second->toSquare % 8;
+        int y = entry.second->toSquare / 8;
+        if (entry.second->capturedPiece != nullptr) {
+            DrawTextureEx(captureTexture, {(float) (x * 100), (float) (y * 100)}, 0, scaleOfImage, WHITE);
+        } else {
+            DrawTextureEx(potentialMoveTexture, {(float) (x * 100), (float) (y * 100)}, 0, scaleOfImage, WHITE);
         }
     }
 
@@ -50,44 +54,55 @@ void Renderer::drawPieces() {
         int x = i % 8;
         int y = i / 8;
         if (board->board[i] != nullptr) {
-            std::string name = board->board[i]->name;
-            switch (board->board[i]->fenName) {
-                case 'K':
-                    DrawTextureEx(whiteKingTexture, { (float)(x * 100), (float)(y * 100) }, 0, scaleOfImage, WHITE);
-                    break;
-                case 'Q':
-                    DrawTextureEx(whiteQueenTexture, { (float)(x * 100), (float)(y * 100) }, 0, scaleOfImage, WHITE);
-                    break;
-                case 'R':
-                    DrawTextureEx(whiteRookTexture, { (float)(x * 100), (float)(y * 100) }, 0, scaleOfImage, WHITE);
-                    break;
-                case 'B':
-                    DrawTextureEx(whiteBishopTexture, { (float)(x * 100), (float)(y * 100) }, 0, scaleOfImage, WHITE);
-                    break;
-                case 'N':
-                    DrawTextureEx(whiteKnightTexture, { (float)(x * 100), (float)(y * 100) }, 0, scaleOfImage, WHITE);
-                    break;
-                case 'P':
-                    DrawTextureEx(whitePawnTexture, { (float)(x * 100), (float)(y * 100) }, 0, scaleOfImage, WHITE);
-                    break;
-                case 'k':
-                    DrawTextureEx(blackKingTexture, { (float)(x * 100), (float)(y * 100) }, 0, scaleOfImage, WHITE);
-                    break;
-                case 'q':
-                    DrawTextureEx(blackQueenTexture, { (float)(x * 100), (float)(y * 100) }, 0, scaleOfImage, WHITE);
-                    break;
-                case 'r':
-                    DrawTextureEx(blackRookTexture, { (float)(x * 100), (float)(y * 100) }, 0, scaleOfImage, WHITE);
-                    break;
-                case 'b':
-                    DrawTextureEx(blackBishopTexture, { (float)(x * 100), (float)(y * 100) }, 0, scaleOfImage, WHITE);
-                    break;
-                case 'n':
-                    DrawTextureEx(blackKnightTexture, { (float)(x * 100), (float)(y * 100) }, 0, scaleOfImage, WHITE);
-                    break;
-                case 'p':
-                    DrawTextureEx(blackPawnTexture, { (float)(x * 100), (float)(y * 100) }, 0, scaleOfImage, WHITE);
-                    break;
+            PieceType name = board->board[i]->name;
+            if (board->board[i]->color == ChessColor::COLORWHITE) {
+                switch (board->board[i]->name) {
+                    case PieceType::KING:
+                        DrawTextureEx(whiteKingTexture, {(float) (x * 100), (float) (y * 100)}, 0, scaleOfImage, WHITE);
+                        break;
+                    case PieceType::QUEEN:
+                        DrawTextureEx(whiteQueenTexture, {(float) (x * 100), (float) (y * 100)}, 0, scaleOfImage,
+                                      WHITE);
+                        break;
+                    case PieceType::ROOK:
+                        DrawTextureEx(whiteRookTexture, {(float) (x * 100), (float) (y * 100)}, 0, scaleOfImage, WHITE);
+                        break;
+                    case PieceType::BISHOP:
+                        DrawTextureEx(whiteBishopTexture, {(float) (x * 100), (float) (y * 100)}, 0, scaleOfImage,
+                                      WHITE);
+                        break;
+                    case PieceType::KNIGHT:
+                        DrawTextureEx(whiteKnightTexture, {(float) (x * 100), (float) (y * 100)}, 0, scaleOfImage,
+                                      WHITE);
+                        break;
+                    case PieceType::PAWN:
+                        DrawTextureEx(whitePawnTexture, {(float) (x * 100), (float) (y * 100)}, 0, scaleOfImage, WHITE);
+                        break;
+                }
+            } else {
+                switch (name) {
+                    case PieceType::KING:
+                        DrawTextureEx(blackKingTexture, {(float) (x * 100), (float) (y * 100)}, 0, scaleOfImage, WHITE);
+                        break;
+                    case PieceType::QUEEN:
+                        DrawTextureEx(blackQueenTexture, {(float) (x * 100), (float) (y * 100)}, 0, scaleOfImage,
+                                      WHITE);
+                        break;
+                    case PieceType::ROOK:
+                        DrawTextureEx(blackRookTexture, {(float) (x * 100), (float) (y * 100)}, 0, scaleOfImage, WHITE);
+                        break;
+                    case PieceType::BISHOP:
+                        DrawTextureEx(blackBishopTexture, {(float) (x * 100), (float) (y * 100)}, 0, scaleOfImage,
+                                      WHITE);
+                        break;
+                    case PieceType::KNIGHT:
+                        DrawTextureEx(blackKnightTexture, {(float) (x * 100), (float) (y * 100)}, 0, scaleOfImage,
+                                      WHITE);
+                        break;
+                    case PieceType::PAWN:
+                        DrawTextureEx(blackPawnTexture, {(float) (x * 100), (float) (y * 100)}, 0, scaleOfImage, WHITE);
+                        break;
+                }
             }
         }
     }

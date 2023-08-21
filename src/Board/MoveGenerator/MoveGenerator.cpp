@@ -1,6 +1,5 @@
 #include "MoveGenerator.h"
 #include <iostream>
-#include <chrono>
 
 MoveGenerator::MoveGenerator(Board* board) {
     this->board = board;
@@ -17,17 +16,19 @@ void MoveGenerator::GenerateMoves() {
 
 void MoveGenerator::GeneratePawnMoves() {
     const std::vector<Piece*> pawns = board->pawns[board->turn];
-    const int promotionRow = board->turn == "white" ? 7 : 0;
-    const int direction = board->turn == "white" ? 1 : -1;
-    const int startingRow = board->turn == "white" ? 1 : 6;
-    const int enPassantRight = board->turn == "white" ? 9 : 7;
-    const int enPassantLeft = board->turn == "white" ? 7 : 9;
+    const bool blackTurn = board->turn == ChessColor::COLORBLACK;
+    const int promotionRow = blackTurn ? 7 : 0;
+    const int direction = blackTurn ? 1 : -1;
+    const int startingRow = blackTurn ? 1 : 6;
+    const int enPassantRight = blackTurn ? 9 : 7;
+    const int enPassantLeft = blackTurn ? 7 : 9;
 
     // Loop through all pawns
     for (Piece* piece : pawns) {
         if (piece == nullptr) {
             continue;
         }
+
         std::map<int, Move*> pawnMoves;
         int position = piece->position;
         int row = position / 8;
@@ -39,40 +40,41 @@ void MoveGenerator::GeneratePawnMoves() {
             // Check if pawn can promote
             if (board->inCheck && board->movesThatBlockCheck.size() > 0) {
                 if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), forwardOneSquare) != board->movesThatBlockCheck.end()) {
-                    pawnMoves.emplace(std::pair{position, new Move(position, forwardOneSquare, board)});
+                    pawnMoves.emplace(std::pair{forwardOneSquare, new Move(position, forwardOneSquare, board)});
                 }
             } else {
-                pawnMoves.emplace(std::pair{position, new Move(position, forwardOneSquare, board)});
+                pawnMoves.emplace(std::pair{forwardOneSquare, new Move(position, forwardOneSquare, board)});
             }
             if (row == startingRow) {
+
                 int forwardTwoSquares = position + (direction * 16);
                 if (board->board[forwardTwoSquares] == nullptr) {
                     if (board->inCheck && board->movesThatBlockCheck.size() > 0) {
                         if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), forwardTwoSquares) != board->movesThatBlockCheck.end()) {
-                            pawnMoves.emplace(std::pair{position, new Move(position, forwardTwoSquares, board)});
+                            pawnMoves.emplace(std::pair{forwardTwoSquares, new Move(position, forwardTwoSquares, board)});
                         }
                     } else {
-                        pawnMoves.emplace(std::pair{position, new Move(position, forwardTwoSquares, board)});
+                        pawnMoves.emplace(std::pair{forwardTwoSquares, new Move(position, forwardTwoSquares, board)});
                     }
                 }
             }
         }
         if (piece->enPassantRight) {
-            if (board->inCheck && board->movesThatBlockCheck.size() > 0) {
+            if (board->inCheck && !board->movesThatBlockCheck.empty()) {
                 if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), position + (direction * enPassantRight)) != board->movesThatBlockCheck.end()) {
-                    pawnMoves.emplace(std::pair{position, new Move(position, position + (direction * enPassantRight), board)});
+                    pawnMoves.emplace(std::pair{position + (direction * enPassantRight), new Move(position, position + (direction * enPassantRight), board)});
                 }
             } else {
-                pawnMoves.emplace(std::pair{position, (new Move(position, position + (direction * enPassantRight), board))});
+                pawnMoves.emplace(std::pair{position + (direction * enPassantRight), (new Move(position, position + (direction * enPassantRight), board))});
             }
         }
         if (piece->enPassantLeft) {
             if (board->inCheck && board->movesThatBlockCheck.size() > 0) {
                 if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), position + (direction * enPassantLeft)) != board->movesThatBlockCheck.end()) {
-                    pawnMoves.emplace(std::pair{position, new Move(position, position + (direction * enPassantLeft), board)});
+                    pawnMoves.emplace(std::pair{position + (direction * enPassantLeft), new Move(position, position + (direction * enPassantLeft), board)});
                 }
             } else {
-                pawnMoves.emplace(std::pair{position, new Move(position, position + (direction * enPassantLeft), board)});
+                pawnMoves.emplace(std::pair{position + (direction * enPassantLeft), new Move(position, position + (direction * enPassantLeft), board)});
             }
         }
         // check if we can capture a piece to the right
@@ -81,10 +83,10 @@ void MoveGenerator::GeneratePawnMoves() {
             if (board->board[rightCapture] != nullptr && board->board[rightCapture]->color != board->turn) {
                 if (board->inCheck && board->movesThatBlockCheck.size() > 0) {
                     if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), rightCapture) != board->movesThatBlockCheck.end()) {
-                        pawnMoves.emplace(std::pair{position, new Move(position, rightCapture, board)});
+                        pawnMoves.emplace(std::pair{rightCapture, new Move(position, rightCapture, board)});
                     }
                 } else {
-                    pawnMoves.emplace(std::pair{position, new Move(position, rightCapture, board)});
+                    pawnMoves.emplace(std::pair{rightCapture, new Move(position, rightCapture, board)});
                 }
             }
         }
@@ -92,17 +94,21 @@ void MoveGenerator::GeneratePawnMoves() {
         if (column != 0) {
             int leftCapture = board->boardArray[row + 1 * direction][column - 1 * direction];
             if (board->board[leftCapture] != nullptr && board->board[leftCapture]->color != board->turn) {
-                if (board->inCheck && board->movesThatBlockCheck.size() > 0) {
+                if (board->inCheck && !board->movesThatBlockCheck.empty()) {
                     if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), leftCapture) != board->movesThatBlockCheck.end()) {
-                        pawnMoves.emplace(std::pair{position, new Move(position, leftCapture, board)});
+                        pawnMoves.emplace(std::pair{leftCapture, new Move(position, leftCapture, board)});
                     }
                 } else {
-                    pawnMoves.emplace(std::pair{position, new Move(position, leftCapture, board)});
+                    pawnMoves.emplace(std::pair{leftCapture, new Move(position, leftCapture, board)});
                 }
             }
         }
 
         piece->moves = pawnMoves;
+        // add the moves to the map of moves
+        for (std::pair move : pawnMoves) {
+            moves.push_back(move.second);
+        }
     }
 }
 
@@ -110,7 +116,7 @@ void MoveGenerator::GenerateKnightMoves() {
     std::vector<Piece*> knights = board->knights[board->turn];
 
     for (Piece* piece: knights) {
-        std::map<int, Move*> knightMoves;
+        std::map<int, Move*> knightMoves = {};
         if (piece == nullptr) {
             continue;
         }
@@ -122,56 +128,56 @@ void MoveGenerator::GenerateKnightMoves() {
         if (row < 6 && column < 7) {
             int move = position + 17;
             if (board->board[move] == nullptr || board->board[move]->color != board->turn) {
-                knightMoves.emplace(std::pair{position, new Move(position, move, board)});
+                knightMoves.emplace(std::pair{move, new Move(position, move, board)});
             }
         }
         // Check if knight can move 2 rows up and 1 column left
         if (row < 6 && column > 0) {
             int move = position + 15;
             if (board->board[move] == nullptr || board->board[move]->color != board->turn) {
-                knightMoves.emplace(std::pair{position, new Move(position, move, board)});
+                knightMoves.emplace(std::pair{move, new Move(position, move, board)});
             }
         }
         // Check if knight can move 2 rows down and 1 column right
         if (row > 1 && column < 7) {
             int move = position - 15;
             if (board->board[move] == nullptr || board->board[move]->color != board->turn) {
-                knightMoves.emplace(std::pair{position, new Move(position, move, board)});
+                knightMoves.emplace(std::pair{move, new Move(position, move, board)});
             }
         }
         // Check if knight can move 2 rows down and 1 column left
         if (row > 1 && column > 0) {
             int move = position - 17;
             if (board->board[move] == nullptr || board->board[move]->color != board->turn) {
-                knightMoves.emplace(std::pair{position, new Move(position, move, board)});
+                knightMoves.emplace(std::pair{move, new Move(position, move, board)});
             }
         }
         // Check if knight can move 1 row up and 2 columns right
         if (row < 7 && column < 6) {
             int move = position + 10;
             if (board->board[move] == nullptr || board->board[move]->color != board->turn) {
-                knightMoves.emplace(std::pair{position, new Move(position, move, board)});
+                knightMoves.emplace(std::pair{move, new Move(position, move, board)});
             }
         }
         // Check if knight can move 1 row up and 2 columns left
         if (row < 7 && column > 1) {
             int move = position + 6;
             if (board->board[move] == nullptr || board->board[move]->color != board->turn) {
-                knightMoves.emplace(std::pair{position, new Move(position, move, board)});
+                knightMoves.emplace(std::pair{move, new Move(position, move, board)});
             }
         }
         // Check if knight can move 1 row down and 2 columns right
         if (row > 0 && column < 6) {
             int move = position - 6;
             if (board->board[move] == nullptr || board->board[move]->color != board->turn) {
-                knightMoves.emplace(std::pair{position, new Move(position, move, board)});
+                knightMoves.emplace(std::pair{move, new Move(position, move, board)});
             }
         }
         // Check if knight can move 1 row down and 2 columns left
         if (row > 0 && column > 1) {
             int move = position - 10;
             if (board->board[move] == nullptr || board->board[move]->color != board->turn) {
-                knightMoves.emplace(std::pair{position, new Move(position, move, board)});
+                knightMoves.emplace(std::pair{move, new Move(position, move, board)});
             }
         }
 
@@ -187,6 +193,10 @@ void MoveGenerator::GenerateKnightMoves() {
         }
 
         piece->moves = knightMoves;
+        // add the moves to the map of moves
+        for (std::pair move : knightMoves) {
+            moves.push_back(move.second);
+        }
     }
 }
 
@@ -204,9 +214,9 @@ void MoveGenerator::GenerateRookMoves() {
         for (int i = row + 1; i < 8; i++) {
             int move = position + (8 * (i - row));
             if (board->board[move] == nullptr) {
-                rookMoves.emplace(std::pair{position, new Move(position, move, board)});
+                rookMoves.emplace(std::pair{move, new Move(position, move, board)});
             } else if (board->board[move]->color != board->turn) {
-                rookMoves.emplace(std::pair{position, new Move(position, move, board)});
+                rookMoves.emplace(std::pair{move, new Move(position, move, board)});
                 break;
             } else {
                 break;
@@ -216,9 +226,9 @@ void MoveGenerator::GenerateRookMoves() {
         for (int i = row - 1; i >= 0; i--) {
             int move = position - (8 * (row - i));
             if (board->board[move] == nullptr) {
-                rookMoves.emplace(std::pair{position, new Move(position, move, board)});
+                rookMoves.emplace(std::pair{move, new Move(position, move, board)});
             } else if (board->board[move]->color != board->turn) {
-                rookMoves.emplace(std::pair{position, new Move(position, move, board)});
+                rookMoves.emplace(std::pair{move, new Move(position, move, board)});
                 break;
             } else {
                 break;
@@ -228,9 +238,9 @@ void MoveGenerator::GenerateRookMoves() {
         for (int i = column + 1; i < 8; i++) {
             int move = position + (i - column);
             if (board->board[move] == nullptr) {
-                rookMoves.emplace(std::pair{position, new Move(position, move, board)});
+                rookMoves.emplace(std::pair{move, new Move(position, move, board)});
             } else if (board->board[move]->color != board->turn) {
-                rookMoves.emplace(std::pair{position, new Move(position, move, board)});
+                rookMoves.emplace(std::pair{move, new Move(position, move, board)});
                 break;
             } else {
                 break;
@@ -240,9 +250,9 @@ void MoveGenerator::GenerateRookMoves() {
         for (int i = column - 1; i >= 0; i--) {
             int move = position - (column - i);
             if (board->board[move] == nullptr) {
-                rookMoves.emplace(std::pair{position, new Move(position, move, board)});
+                rookMoves.emplace(std::pair{move, new Move(position, move, board)});
             } else if (board->board[move]->color != board->turn) {
-                rookMoves.emplace(std::pair{position, new Move(position, move, board)});
+                rookMoves.emplace(std::pair{move, new Move(position, move, board)});
                 break;
             } else {
                 break;
@@ -261,7 +271,10 @@ void MoveGenerator::GenerateRookMoves() {
         }
 
         piece->moves = rookMoves;
-
+        // add the moves to the map of moves
+        for (std::pair move : rookMoves) {
+            moves.push_back(move.second);
+        }
     }
 }
 
@@ -285,9 +298,9 @@ void MoveGenerator::GenerateBishopMoves() {
             }
             int move = position + (9 * i);
             if (board->board[move] == nullptr) {
-                bishopMoves.emplace(std::pair{position, new Move(position, move, board)});
+                bishopMoves.emplace(std::pair{move, new Move(position, move, board)});
             } else if (board->board[move]->color != board->turn) {
-                bishopMoves.emplace(std::pair{position, new Move(position, move, board)});
+                bishopMoves.emplace(std::pair{move, new Move(position, move, board)});
                 break;
             } else {
                 break;
@@ -301,9 +314,9 @@ void MoveGenerator::GenerateBishopMoves() {
             }
             int move = position + (7 * i);
             if (board->board[move] == nullptr) {
-                bishopMoves.emplace(std::pair{position, new Move(position, move, board)});
+                bishopMoves.emplace(std::pair{move, new Move(position, move, board)});
             } else if (board->board[move]->color != board->turn) {
-                bishopMoves.emplace(std::pair{position, new Move(position, move, board)});
+                bishopMoves.emplace(std::pair{move, new Move(position, move, board)});
                 break;
             } else {
                 break;
@@ -317,9 +330,9 @@ void MoveGenerator::GenerateBishopMoves() {
             }
             int move = position - (7 * i);
             if (board->board[move] == nullptr) {
-                bishopMoves.emplace(std::pair{position, new Move(position, move, board)});
+                bishopMoves.emplace(std::pair{move, new Move(position, move, board)});
             } else if (board->board[move]->color != board->turn) {
-                bishopMoves.emplace(std::pair{position, new Move(position, move, board)});
+                bishopMoves.emplace(std::pair{move, new Move(position, move, board)});
                 break;
             } else {
                 break;
@@ -333,9 +346,9 @@ void MoveGenerator::GenerateBishopMoves() {
             }
             int move = position - (9 * i);
             if (board->board[move] == nullptr) {
-                bishopMoves.emplace(std::pair{position, new Move(position, move, board)});
+                bishopMoves.emplace(std::pair{move, new Move(position, move, board)});
             } else if (board->board[move]->color != board->turn) {
-                bishopMoves.emplace(std::pair{position, new Move(position, move, board)});
+                bishopMoves.emplace(std::pair{move, new Move(position, move, board)});
                 break;
             } else {
                 break;
@@ -354,6 +367,9 @@ void MoveGenerator::GenerateBishopMoves() {
         }
 
         piece->moves = bishopMoves;
+        for (std::pair move : bishopMoves) {
+            moves.push_back(move.second);
+        }
     }
 }
 
@@ -366,17 +382,14 @@ void MoveGenerator::GenerateQueenMoves() {
         const int column = position % 8;
 
         std::map<int, Move*> queenMoves;
-        if (piece == nullptr) {
-            continue;
-        }
 
         // Check if queen can move up
         for (int i = row + 1; i < 8; i++) {
             int move = position + (8 * (i - row));
             if (board->board[move] == nullptr) {
-                queenMoves.emplace(std::pair{position, new Move(position, move, board)});
+                queenMoves.emplace(std::pair{move, new Move(position, move, board)});
             } else if (board->board[move]->color != board->turn) {
-                queenMoves.emplace(std::pair{position, new Move(position, move, board)});
+                queenMoves.emplace(std::pair{move, new Move(position, move, board)});
                 break;
             } else {
                 break;
@@ -387,9 +400,9 @@ void MoveGenerator::GenerateQueenMoves() {
         for (int i = row - 1; i >= 0; i--) {
             int move = position - (8 * (row - i));
             if (board->board[move] == nullptr) {
-                queenMoves.emplace(std::pair{position, new Move(position, move, board)});
+                queenMoves.emplace(std::pair{move, new Move(position, move, board)});
             } else if (board->board[move]->color != board->turn) {
-                queenMoves.emplace(std::pair{position, new Move(position, move, board)});
+                queenMoves.emplace(std::pair{move, new Move(position, move, board)});
                 break;
             } else {
                 break;
@@ -400,9 +413,9 @@ void MoveGenerator::GenerateQueenMoves() {
         for (int i = column + 1; i < 8; i++) {
             int move = position + (i - column);
             if (board->board[move] == nullptr) {
-                queenMoves.emplace(std::pair{position, new Move(position, move, board)});
+                queenMoves.emplace(std::pair{move, new Move(position, move, board)});
             } else if (board->board[move]->color != board->turn) {
-                queenMoves.emplace(std::pair{position, new Move(position, move, board)});
+                queenMoves.emplace(std::pair{move, new Move(position, move, board)});
                 break;
             } else {
                 break;
@@ -413,9 +426,9 @@ void MoveGenerator::GenerateQueenMoves() {
         for (int i = column - 1; i >= 0; i--) {
             int move = position - (column - i);
             if (board->board[move] == nullptr) {
-                queenMoves.emplace(std::pair{position, new Move(position, move, board)});
+                queenMoves.emplace(std::pair{move, new Move(position, move, board)});
             } else if (board->board[move]->color != board->turn) {
-                queenMoves.emplace(std::pair{position, new Move(position, move, board)});
+                queenMoves.emplace(std::pair{move, new Move(position, move, board)});
                 break;
             } else {
                 break;
@@ -429,9 +442,9 @@ void MoveGenerator::GenerateQueenMoves() {
             }
             int move = position + (9 * i);
             if (board->board[move] == nullptr) {
-                queenMoves.emplace(std::pair{position, new Move(position, move, board)});
+                queenMoves.emplace(std::pair{move, new Move(position, move, board)});
             } else if (board->board[move]->color != board->turn) {
-                queenMoves.emplace(std::pair{position, new Move(position, move, board)});
+                queenMoves.emplace(std::pair{move, new Move(position, move, board)});
                 break;
             } else {
                 break;
@@ -445,9 +458,9 @@ void MoveGenerator::GenerateQueenMoves() {
             }
             int move = position + (7 * i);
             if (board->board[move] == nullptr) {
-                queenMoves.emplace(std::pair{position, new Move(position, move, board)});
+                queenMoves.emplace(std::pair{move, new Move(position, move, board)});
             } else if (board->board[move]->color != board->turn) {
-                queenMoves.emplace(std::pair{position, new Move(position, move, board)});
+                queenMoves.emplace(std::pair{move, new Move(position, move, board)});
                 break;
             } else {
                 break;
@@ -461,9 +474,9 @@ void MoveGenerator::GenerateQueenMoves() {
             }
             int move = position - (7 * i);
             if (board->board[move] == nullptr) {
-                queenMoves.emplace(std::pair{position, new Move(position, move, board)});
+                queenMoves.emplace(std::pair{move, new Move(position, move, board)});
             } else if (board->board[move]->color != board->turn) {
-                queenMoves.emplace(std::pair{position, new Move(position, move, board)});
+                queenMoves.emplace(std::pair{move, new Move(position, move, board)});
                 break;
             } else {
                 break;
@@ -477,9 +490,9 @@ void MoveGenerator::GenerateQueenMoves() {
             }
             int move = position - (9 * i);
             if (board->board[move] == nullptr) {
-                queenMoves.emplace(std::pair{position, new Move(position, move, board)});
+                queenMoves.emplace(std::pair{move, new Move(position, move, board)});
             } else if (board->board[move]->color != board->turn) {
-                queenMoves.emplace(std::pair{position, new Move(position, move, board)});
+                queenMoves.emplace(std::pair{move, new Move(position, move, board)});
                 break;
             } else {
                 break;
@@ -498,6 +511,9 @@ void MoveGenerator::GenerateQueenMoves() {
         }
 
         piece->moves = queenMoves;
+        for (std::pair move : queenMoves) {
+            moves.push_back(move.second);
+        }
     }
 }
 
@@ -517,7 +533,7 @@ void MoveGenerator::GenerateKingMoves() {
         if (row < 7) {
             int move = position + 8;
             if (board->board[move] == nullptr || board->board[move]->color != board->turn) {
-                kingMoves.emplace(std::pair{position, new Move(position, move, board)});
+                kingMoves.emplace(std::pair{move, new Move(position, move, board)});
 
             }
         }
@@ -525,49 +541,49 @@ void MoveGenerator::GenerateKingMoves() {
         if (row > 0) {
             int move = position - 8;
             if (board->board[move] == nullptr || board->board[move]->color != board->turn) {
-                kingMoves.emplace(std::pair{position, new Move(position, move, board)});
+                kingMoves.emplace(std::pair{move, new Move(position, move, board)});
             }
         }
         // Check if king can move 1 column right
         if (column < 7) {
             int move = position + 1;
             if (board->board[move] == nullptr || board->board[move]->color != board->turn) {
-                kingMoves.emplace(std::pair{position, new Move(position, move, board)});
+                kingMoves.emplace(std::pair{move, new Move(position, move, board)});
             }
         }
         // Check if king can move 1 column left
         if (column > 0) {
             int move = position - 1;
             if (board->board[move] == nullptr || board->board[move]->color != board->turn) {
-                kingMoves.emplace(std::pair{position, new Move(position, move, board)});
+                kingMoves.emplace(std::pair{move, new Move(position, move, board)});
             }
         }
         // Check if king can move 1 row up and 1 column right
         if (row < 7 && column < 7) {
             int move = position + 9;
             if (board->board[move] == nullptr || board->board[move]->color != board->turn) {
-                kingMoves.emplace(std::pair{position, new Move(position, move, board)});
+                kingMoves.emplace(std::pair{move, new Move(position, move, board)});
             }
         }
         // Check if king can move 1 row up and 1 column left
         if (row < 7 && column > 0) {
             int move = position + 7;
             if (board->board[move] == nullptr || board->board[move]->color != board->turn) {
-                kingMoves.emplace(std::pair{position, new Move(position, move, board)});
+                kingMoves.emplace(std::pair{move, new Move(position, move, board)});
             }
         }
         // Check if king can move 1 row down and 1 column right
         if (row > 0 && column < 7) {
             int move = position - 7;
             if (board->board[move] == nullptr || board->board[move]->color != board->turn) {
-                kingMoves.emplace(std::pair{position, new Move(position, move, board)});
+                kingMoves.emplace(std::pair{move, new Move(position, move, board)});
             }
         }
         // Check if king can move 1 row down and 1 column left
         if (row > 0 && column > 0) {
             int move = position - 9;
             if (board->board[move] == nullptr || board->board[move]->color != board->turn) {
-                kingMoves.emplace(std::pair{position, new Move(position, move, board)});
+                kingMoves.emplace(std::pair{move, new Move(position, move, board)});
             }
         }
 
@@ -581,5 +597,8 @@ void MoveGenerator::GenerateKingMoves() {
         kingMoves = validMoves;
 
         piece->moves = kingMoves;
+        for (std::pair move : kingMoves) {
+            moves.push_back(move.second);
+        }
     }
 }
