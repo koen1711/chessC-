@@ -2,7 +2,7 @@
 #include <raylib.h>
 #include <iostream>
 #include <chrono>
-#include "Board/Board.h"
+#include "Board/ViewBoard.h"
 #include "Render/Renderer.h"
 
 int moveCount = 0;
@@ -13,23 +13,27 @@ void MoveGenerationTest(int depth, Board* board, Renderer* renderer)
         return;
     }
 
-    std::map<int, Piece*> pieces = board->board;
+    std::vector<Piece*> pieces = board->board;
 
-    for (const auto& pair : pieces) {
-        Piece* piece = pair.second;
+    for (const auto& piece : pieces) {
 
         if (piece == nullptr)
             continue;
         if (piece->color == board->turn) {
-            for (std::pair<int, Move*> move : piece->getMoves()) {
-                board->movePiece(move.second);
-                moveCount++;
-                board->gameLoop();
+            std::vector<Move*> moves = piece->getMoves();
+            if (depth == 1) {
+                moveCount += moves.size();
+            }
+            for (auto move : moves) {
+                board->movePiece(move);
+                if (depth != 1) {
+                    board->gameLoop();
+                }
                 //BeginDrawing();
                 //renderer->render();
                 //EndDrawing();
                 MoveGenerationTest(depth - 1, board, renderer);
-                board->undoMove(*move.second);
+                board->undoMove(*move);
             }
         }
     }
@@ -43,19 +47,22 @@ int main(int argc, char** argv)
     InitWindow(screenWidth, screenHeight, "Chess Game");
     SetTargetFPS(60);
 
-    auto* board = new Board();
+    auto* board = new ViewBoard();
+    board->init();
     auto* renderer = new Renderer(board);
 
     Vector2 mousePosition = {0, 0};
-    for (int i = 1; i < 7; i++) {
+    for (int i = 1; i < 5; i++) {
         // Start the timer
         auto start = std::chrono::high_resolution_clock::now();
-        MoveGenerationTest(i, board, renderer);
+        MoveGenerationTest(i, board->board, renderer);
         std::cout << "Depth: " << i << " Move Count: " << moveCount << " Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() << "ms" << std::endl;
         moveCount = 0;
-        board->moveGenerator->GenerateMoves();
+        board->board->moveGenerator->GenerateCapturesOnly();
+        board->board->gameLoop();
     }
 
+    board->drawingBoard = board->board->board;
     while (!WindowShouldClose())
     {
         mousePosition = GetMousePosition();

@@ -1,4 +1,4 @@
-# Install script for directory: /home/koen/Documents/GitHub/ChessC++
+# Install script for directory: /media/koen/PortableSSD/GitHub/ChessC++
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -44,7 +44,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/koen/Documents/GitHub/ChessC++/libs/raylib/cmake_install.cmake")
+  include("/media/koen/PortableSSD/GitHub/ChessC++/libs/raylib/cmake_install.cmake")
 
 endif()
 
@@ -56,5 +56,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/koen/Documents/GitHub/ChessC++/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/media/koen/PortableSSD/GitHub/ChessC++/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

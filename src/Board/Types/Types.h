@@ -1,6 +1,8 @@
 #ifndef CHESSC_TYPES_H
 #define CHESSC_TYPES_H
 
+#include <cmath>
+
 enum ChessColor {
     COLORWHITE = 0,
     COLORBLACK = 1
@@ -15,6 +17,15 @@ enum PieceType {
     KING
 };
 
+struct PieceFlags {
+    bool MOVED = false;
+    bool ENPASSANTLEFT = false;
+    bool ENPASSANTRIGHT = false;
+    bool CASTLED = false;
+    bool PINNED = false;
+
+};
+
 enum PieceValue {
     PAWNVALUE = 100,
     KNIGHTVALUE = 320,
@@ -22,6 +33,17 @@ enum PieceValue {
     ROOKVALUE = 500,
     QUEENVALUE = 900,
     KINGVALUE = 20000
+};
+
+enum Directions {
+    VERTICALUP = 0,
+    VERTICALDOWN = 1,
+    HORIZONTALLEFT = 2,
+    HORIZONTALRIGHT = 3,
+    DIAGONALUPLEFT = 4,
+    DIAGONALUPRIGHT = 5,
+    DIAGONALDOWNLEFT = 6,
+    DIAGONALDOWNRIGHT = 7,
 };
 
 struct PieceSquareTable {
@@ -86,6 +108,7 @@ struct PieceSquareTable {
             -30, -40, -40, -50, -50, -40, -40, -30
     };
 };
+
 
 enum MoveType {
     NORMALMOVE = 0,

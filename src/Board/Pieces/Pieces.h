@@ -1,28 +1,25 @@
 #ifndef CHESSC___PIECES_H
 #define CHESSC___PIECES_H
 
-#include <string>
-#include <vector>
-#include <map>
 #include "../Move/Move.h"
 #include "../Types/Types.h"
+#include <vector>
 
 class Move;
 
 class Piece {
-    public:
-        PieceType name;
-        ChessColor color;
-        int position;
-        std::map<int, Move*> moves = {};
-        bool enPassantLeft = false;
-        bool enPassantRight = false;
+public:
+    PieceType name;
+    ChessColor color;
+    int position;
+    std::vector<Move*> moves = {};
+    PieceFlags* pFlags = new PieceFlags();
+    Directions pinDirection = Directions::VERTICALUP;
 
-        Piece(PieceType name, ChessColor color, int square);
-        std::map<int, Move*> getMoves();
-
-        bool pinned = false;
+    Piece(PieceType name, ChessColor color, int square);
+    std::vector<Move*> getMoves();
 };
+
 
 class Pawn : public Piece {
     public:
@@ -53,6 +50,5 @@ class King : public Piece {
     public:
         King(ChessColor color, int square);
 };
-
 
 #endif //CHESSC___PIECES_H

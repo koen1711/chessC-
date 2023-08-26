@@ -1,19 +1,19 @@
 #ifndef CHESSGAME_RENDERER_H
 #define CHESSGAME_RENDERER_H
 
-#include "../Board/Board.h"
+#include "../Board/ViewBoard.h"
 #include <raylib.h>
 
-class Board;
+class ViewBoard;
 
 class Renderer {
 public:
-    Renderer(Board* board);
+    Renderer(ViewBoard* board);
     ~Renderer();
 
     void render();
 private:
-    Board* board;
+    ViewBoard* viewBoard;
     Texture captureTexture = LoadTexture("assets/selection.png");
     Texture potentialMoveTexture = LoadTexture("assets/potential-move.png");
     Texture whiteKingTexture = LoadTexture("assets/white-king.png");
