@@ -106,6 +106,6 @@ void Renderer::drawPieces() {
                     break;
             }
         }
-        bitboard &= bitboard - 1;
+        bitboard &= bitboard - 1ULL;
     }
 }

@@ -57,7 +57,7 @@ void MoveGenerator::GeneratePawnMoves() {
         // Get the position of the first pawn
         int position = __builtin_ctzll(pawnsBitboard);
         // Remove the first pawn from the bitboard
-        pawnsBitboard &= pawnsBitboard - 1;
+        pawnsBitboard &= pawnsBitboard - 1ULL;
         // Generate the moves for the pawn
 
         // Get if this position is in the whitePiecesBitboard
@@ -169,7 +169,7 @@ void MoveGenerator::GenerateKnightMoves() {
         // Get the position of the first knight
         int position = __builtin_ctzll(knightsBitboard);
         // Remove the first knight from the bitboard
-        knightsBitboard &= knightsBitboard - 1;
+        knightsBitboard &= knightsBitboard - 1ULL;
         // Generate the moves for the knight
         GenerateOneKnightMoves(position);
     }
@@ -313,7 +313,7 @@ void MoveGenerator::GenerateRookMoves() {
         // Get the position of the first rook
         int position = __builtin_ctzll(rooksBitboard);
         // Remove the first rook from the bitboard
-        rooksBitboard &= rooksBitboard - 1;
+        rooksBitboard &= rooksBitboard - 1ULL;
         // Generate the moves for the rook
         GenerateOneRookMoves(position);
     }
@@ -421,7 +421,7 @@ void MoveGenerator::GenerateBishopMoves() {
         // Get the position of the first bishop
         int position = __builtin_ctzll(bishopsBitboard);
         // Remove the first bishop from the bitboard
-        bishopsBitboard &= bishopsBitboard - 1;
+        bishopsBitboard &= bishopsBitboard - 1ULL;
         // Generate the moves for the bishop
         GenerateOneBishopMoves(position);
     }
@@ -536,7 +536,7 @@ void MoveGenerator::GenerateQueenMoves() {
         // Get the position of the first queen
         int position = __builtin_ctzll(queensBitboard);
         // Remove the first queen from the bitboard
-        queensBitboard &= queensBitboard - 1;
+        queensBitboard &= queensBitboard - 1ULL;
         // Generate the moves for the queen
         GenerateOneQueenMoves(position);
     }
@@ -735,7 +735,7 @@ void MoveGenerator::GenerateKingMoves() {
             king = board->blackKing;
         }
         GenerateOneKingMoves(king);
-        kingBitboard &= kingBitboard - 1;
+        kingBitboard &= kingBitboard - 1ULL;
     }
 }
 
@@ -874,7 +874,7 @@ std::vector<int> MoveGenerator::GeneratePawnCaptures() const {
                 pawnCaptures.push_back(position + 7);
             }
         }
-        pawnsBitboard &= pawnsBitboard - 1;
+        pawnsBitboard &= pawnsBitboard - 1ULL;
     }
     return pawnCaptures;
 }
@@ -930,7 +930,7 @@ std::vector<int> MoveGenerator::GenerateKnightCaptures() const {
             int move = position - 10;
             knightCaptures.push_back(move);
         }
-        knightsBitboard &= knightsBitboard - 1;
+        knightsBitboard &= knightsBitboard - 1ULL;
     }
     return knightCaptures;
 }
@@ -1010,7 +1010,7 @@ std::vector<int> MoveGenerator::GenerateBishopCaptures() const {
                 break;
             }
         }
-        bishopsBitboard &= bishopsBitboard - 1;
+        bishopsBitboard &= bishopsBitboard - 1ULL;
     }
 
     return bishopCaptures;
@@ -1070,7 +1070,7 @@ std::vector<int> MoveGenerator::GenerateRookCaptures() const {
                 break;
             }
         }
-        rooksBitboard &= rooksBitboard - 1;
+        rooksBitboard &= rooksBitboard - 1ULL;
     }
 
     return rookCaptures;
@@ -1178,7 +1178,7 @@ std::vector<int> MoveGenerator::GenerateQueenCaptures() const {
             break;
             }
         }
-        queensBitboard &= queensBitboard - 1;
+        queensBitboard &= queensBitboard - 1ULL;
     }
     return queenCaptures;
 }
@@ -1232,7 +1232,7 @@ std::vector<int> MoveGenerator::GenerateKingCaptures() const {
             int move = position - 9;
             kingCaptures.push_back(move);
         }
-        kingsBitboard &= kingsBitboard - 1;
+        kingsBitboard &= kingsBitboard - 1ULL;
     }
     return kingCaptures;
 }

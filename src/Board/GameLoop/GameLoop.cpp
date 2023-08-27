@@ -334,6 +334,7 @@ std::vector<int> GameLoop::getPositionsBetween(int startPos, int endPos) {
 
 void GameLoop::getPinnedPieces() {
     for (auto pinnedPiece : pinnedPieces) {
+        ChessColor color = board->getPieceColor(pinnedPiece.first);
         switch (pinnedPiece.second) {
             case Directions::DIAGONALUPLEFT:
                 for (int i = pinnedPiece.first; i < 64; i -= 9) {
@@ -341,7 +342,7 @@ void GameLoop::getPinnedPieces() {
                         if (board->getPieceColor(i) == pinnedPiece.first && i != pinnedPiece.first) {
                             break;
                         }
-                        if (board->getPieceColor(i) != pinnedPiece.first && (board->getPieceType(i) == PieceType::BISHOP || board->getPieceType(i) == PieceType::QUEEN)) {
+                        if (board->getPieceColor(i) != color && (board->getPieceType(i) == PieceType::BISHOP || board->getPieceType(i) == PieceType::QUEEN)) {
                             //pinnedPiece.first->pinDirection = Directions::DIAGONALUPLEFT;
                             board->pinnedPieces.push_back(pinnedPiece.first);
                             break;
@@ -358,7 +359,7 @@ void GameLoop::getPinnedPieces() {
                         if (board->getPieceColor(i) == pinnedPiece.first && i != pinnedPiece.first) {
                             break;
                         }
-                        if (board->getPieceColor(i) != pinnedPiece.first && (board->getPieceType(i) == PieceType::BISHOP || board->getPieceType(i) == PieceType::QUEEN)) {
+                        if (board->getPieceColor(i) != color && (board->getPieceType(i) == PieceType::BISHOP || board->getPieceType(i) == PieceType::QUEEN)) {
                             //pinnedPiece.first->pinDirection = Directions::DIAGONALUPRIGHT;
                             board->pinnedPieces.push_back(pinnedPiece.first);
                             break;
@@ -375,7 +376,7 @@ void GameLoop::getPinnedPieces() {
                         if (board->getPieceColor(i) == pinnedPiece.first && i != pinnedPiece.first) {
                             break;
                         }
-                        if (board->getPieceColor(i) != pinnedPiece.first && (board->getPieceType(i) == PieceType::BISHOP || board->getPieceType(i) == PieceType::QUEEN)) {
+                        if (board->getPieceColor(i) != color && (board->getPieceType(i) == PieceType::BISHOP || board->getPieceType(i) == PieceType::QUEEN)) {
                             //pinnedPiece.first->pinDirection = Directions::DIAGONALDOWNLEFT;
                             board->pinnedPieces.push_back(pinnedPiece.first);
                             break;
@@ -392,7 +393,7 @@ void GameLoop::getPinnedPieces() {
                         if (board->getPieceColor(i) == pinnedPiece.first && i != pinnedPiece.first) {
                             break;
                         }
-                        if (board->getPieceColor(i) != pinnedPiece.first && (board->getPieceType(i) == PieceType::BISHOP || board->getPieceType(i) == PieceType::QUEEN)) {
+                        if (board->getPieceColor(i) != color && (board->getPieceType(i) == PieceType::BISHOP || board->getPieceType(i) == PieceType::QUEEN)) {
                             //pinnedPiece.first->pinDirection = Directions::DIAGONALDOWNRIGHT;
                             board->pinnedPieces.push_back(pinnedPiece.first);
                             break;
@@ -409,7 +410,7 @@ void GameLoop::getPinnedPieces() {
                         if (board->getPieceColor(i) == pinnedPiece.first && i != pinnedPiece.first) {
                             break;
                         }
-                        if (board->getPieceColor(i) != pinnedPiece.first && (board->getPieceType(i) == PieceType::ROOK || board->getPieceType(i) == PieceType::QUEEN)) {
+                        if (board->getPieceColor(i) != color && (board->getPieceType(i) == PieceType::ROOK || board->getPieceType(i) == PieceType::QUEEN)) {
                             //pinnedPiece.first->pinDirection = Directions::HORIZONTALLEFT;
                             board->pinnedPieces.push_back(pinnedPiece.first);
                             break;
@@ -426,7 +427,7 @@ void GameLoop::getPinnedPieces() {
                         if (board->getPieceColor(i) == pinnedPiece.first && i != pinnedPiece.first) {
                             break;
                         }
-                        if (board->getPieceColor(i) != pinnedPiece.first && (board->getPieceType(i) == PieceType::ROOK || board->getPieceType(i) == PieceType::QUEEN)) {
+                        if (board->getPieceColor(i) != color && (board->getPieceType(i) == PieceType::ROOK || board->getPieceType(i) == PieceType::QUEEN)) {
                             //pinnedPiece.first->pinDirection = Directions::HORIZONTALRIGHT;
                             board->pinnedPieces.push_back(pinnedPiece.first);
                             break;
@@ -443,7 +444,7 @@ void GameLoop::getPinnedPieces() {
                         if (board->getPieceColor(i) == pinnedPiece.first && i != pinnedPiece.first) {
                             break;
                         }
-                        if (board->getPieceColor(i) != pinnedPiece.first && (board->getPieceType(i) == PieceType::ROOK || board->getPieceType(i) == PieceType::QUEEN)) {
+                        if (board->getPieceColor(i) != color && (board->getPieceType(i) == PieceType::ROOK || board->getPieceType(i) == PieceType::QUEEN)) {
                             //pinnedPiece.first->pinDirection = Directions::VERTICALUP;
                             board->pinnedPieces.push_back(pinnedPiece.first);
                             break;
@@ -457,7 +458,7 @@ void GameLoop::getPinnedPieces() {
                         if (board->getPieceColor(i) == pinnedPiece.first && i != pinnedPiece.first) {
                             break;
                         }
-                        if (board->getPieceColor(i) != pinnedPiece.first && (board->getPieceType(i) == PieceType::ROOK || board->getPieceType(i) == PieceType::QUEEN)) {
+                        if (board->getPieceColor(i) != color && (board->getPieceType(i) == PieceType::ROOK || board->getPieceType(i) == PieceType::QUEEN)) {
                             //pinnedPiece.first->pinDirection = Directions::VERTICALDOWN;
                             board->pinnedPieces.push_back(pinnedPiece.first);
                             break;

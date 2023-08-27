@@ -300,8 +300,6 @@ void Board::removePiece(int position) {
 }
 
 void Board::movePiece(int from, int to) {
-    std::cout << "Moving piece from " << from << " to " << to << std::endl;
-    std::cout << "Type: " << getPieceType(from) << std::endl;
     switch (getPieceType(from)) {
         case PieceType::PAWN:
             pawnsBitboard &= ~(1ULL << from); // Remove the pawn from the pawns bitboard
@@ -331,7 +329,6 @@ void Board::movePiece(int from, int to) {
             break;
     }
 
-    std::cout << "Color: " << getPieceColor(from) << std::endl;
     if (getPieceColor(from) == ChessColor::COLORWHITE) {
         whitePiecesBitboard &= ~(1ULL << from);
         whitePiecesBitboard |= (1ULL << to);

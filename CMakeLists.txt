@@ -37,11 +37,4 @@ add_executable(ChessC ${SOURCES})
 # Link against raylib and other libraries
 target_link_libraries(ChessC raylib)
 
-# Set properties for the executable
-set_target_properties(ChessC
-        PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-)
-
-
 
