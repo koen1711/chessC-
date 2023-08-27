@@ -14,7 +14,8 @@ enum PieceType {
     BISHOP,
     ROOK,
     QUEEN,
-    KING
+    KING,
+    NONE
 };
 
 struct PieceFlags {

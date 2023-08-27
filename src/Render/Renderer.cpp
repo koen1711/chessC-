@@ -29,8 +29,8 @@ void Renderer::drawBoard() {
 
     // draw all the moves that block check
     for (auto piece : viewBoard->board->pinnedPieces) {
-        int x = piece->position % 8;
-        int y = piece->position / 8;
+        int x = piece % 8;
+        int y = piece / 8;
         DrawRectangle(x * 100, y * 100, 100, 100, BLUE);
     }
 
@@ -40,7 +40,7 @@ void Renderer::drawBoard() {
         }
         int x = entry->toSquare % 8;
         int y = entry->toSquare / 8;
-        if (entry->capturedPiece != nullptr) {
+        if (entry->capturedPiece != NONE) {
             DrawTextureEx(captureTexture, {(float) (x * 100), (float) (y * 100)}, 0, scaleOfImage, WHITE);
         } else {
             DrawTextureEx(potentialMoveTexture, {(float) (x * 100), (float) (y * 100)}, 0, scaleOfImage, WHITE);
@@ -50,12 +50,15 @@ void Renderer::drawBoard() {
 
 void Renderer::drawPieces() {
     float scaleOfImage = ((float)GetScreenWidth() / (float)(8)) / 82;
-    for (auto piece : viewBoard->board->pieces) {
-        int x = piece->position % 8;
-        int y = piece->position / 8;
-        PieceType name = piece->name;
-        if (piece->color == ChessColor::COLORWHITE) {
-            switch (piece->name) {
+    // Loop through the pieces bitboard
+    uint64_t bitboard = viewBoard->board->whitePiecesBitboard | viewBoard->board->blackPiecesBitboard;
+
+    while (bitboard) {
+        int position = __builtin_ctzll(bitboard);
+        int x = position % 8;
+        int y = position / 8;
+        if (viewBoard->board->getPieceColor(position) == ChessColor::COLORWHITE) {
+            switch (viewBoard->board->getPieceType(position)) {
                 case PieceType::KING:
                     DrawTextureEx(whiteKingTexture, {(float) (x * 100), (float) (y * 100)}, 0, scaleOfImage, WHITE);
                     break;
@@ -79,7 +82,7 @@ void Renderer::drawPieces() {
                     break;
             }
         } else {
-            switch (name) {
+            switch (viewBoard->board->getPieceType(position)) {
                 case PieceType::KING:
                     DrawTextureEx(blackKingTexture, {(float) (x * 100), (float) (y * 100)}, 0, scaleOfImage, WHITE);
                     break;
@@ -103,5 +106,6 @@ void Renderer::drawPieces() {
                     break;
             }
         }
+        bitboard &= bitboard - 1;
     }
 }

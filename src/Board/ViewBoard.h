@@ -24,9 +24,7 @@ public:
 
     std::vector<Move*> potentialMoves;
 
-    Piece* activePiece = nullptr;
-
-    std::vector<Piece*> drawingBoard;
+    int activePiece = -1;
 
 
     ViewBoard();

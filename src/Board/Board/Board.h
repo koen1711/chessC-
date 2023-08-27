@@ -8,6 +8,8 @@
 #include "../Types/Types.h"
 #include "../Move/Move.h"
 #include <map>
+#include <cstdint>
+#include <unordered_map>
 
 class Move;
 
@@ -22,22 +24,29 @@ public:
     GameLoop* gameLoopClass;
 
     std::vector<int> controlledSquares;
-    std::vector<Piece*> board;
-    std::vector<Piece*> pinnedPieces;
+    std::vector<Piece*> boardL;
+    std::vector<int> pinnedPieces;
     std::vector<int> movesThatBlockCheck;
 
-    std::vector<Piece*> pieces;
+    uint64_t whitePiecesBitboard = 0ULL;
+    uint64_t blackPiecesBitboard = 0ULL;
 
+    uint64_t enPassantLeftBitboard = 0ULL;
+    uint64_t enPassantRightBitboard = 0ULL;
 
-    std::map<ChessColor, std::vector<int>> pawns = {std::make_pair(ChessColor::COLORWHITE, std::vector<int>()), std::make_pair(ChessColor::COLORBLACK, std::vector<int>())};
-    std::map<ChessColor, std::vector<int>> knights = {std::make_pair(ChessColor::COLORWHITE, std::vector<int>()), std::make_pair(ChessColor::COLORBLACK, std::vector<int>())};
-    std::map<ChessColor, std::vector<int>> bishops = {std::make_pair(ChessColor::COLORWHITE, std::vector<int>()), std::make_pair(ChessColor::COLORBLACK, std::vector<int>())};
-    std::map<ChessColor, std::vector<int>> rooks = {std::make_pair(ChessColor::COLORWHITE, std::vector<int>()), std::make_pair(ChessColor::COLORBLACK, std::vector<int>())};
-    std::map<ChessColor, std::vector<int>> queens = {std::make_pair(ChessColor::COLORWHITE, std::vector<int>()), std::make_pair(ChessColor::COLORBLACK, std::vector<int>())};
-    std::map<ChessColor, int> kings = {std::make_pair(ChessColor::COLORWHITE, 0), std::make_pair(ChessColor::COLORBLACK, 0)};
+    uint64_t pawnsBitboard = 0ULL;
+    uint64_t knightsBitboard = 0ULL;
+    uint64_t bishopsBitboard = 0ULL;
+    uint64_t rooksBitboard = 0ULL;
+    uint64_t queensBitboard = 0ULL;
+    uint64_t kingsBitboard = 0ULL;
+    int whiteKing = 0;
+    int blackKing = 0;
 
     bool inCheck = false;
     bool checkmate = false;
+
+    std::unordered_map<int, std::vector<Move*>> moveMap = {};
 
     int amountOfChecks = 0;
     bool knightChecked = false;
@@ -45,15 +54,20 @@ public:
 
     void gameLoop() const;
 
-    void movePiece(Move *move);
+    void makeMove(Move *move);
 
     void removePiece(int position);
 
-    void promotePawn(Piece *pawn);
+    void promotePawn(int position);
 
     MoveGenerator* moveGenerator;
 
     void undoMove(const Move &move);
+
+    PieceType getPieceType(int position) const;
+    ChessColor getPieceColor(int position) const;
+
+    void movePiece(int from, int to);
 };
 
 

@@ -6,6 +6,7 @@
 #include <vector>
 #include <bitset>
 #include <algorithm>
+#include <cstdint>
 
 class Board;
 class Piece;
@@ -32,12 +33,12 @@ private:
     void GenerateRookMoves();
     void GenerateQueenMoves();
     void GenerateKingMoves();
-    void GenerateOnePawnMoves(Piece* piece, int direction, int startingRow, int enPassantRight, int enPassantLeft) const;
-    void GenerateOneKnightMoves(Piece* p) const;
-    void GenerateOneBishopMoves(Piece* p) const;
-    void GenerateOneRookMoves(Piece* p) const;
-    void GenerateOneQueenMoves(Piece* p) const;
-    void GenerateOneKingMoves(Piece* p) const;
+    void GenerateOnePawnMoves(int position, int direction, int startingRow, int enPassantRight, int enPassantLeft) const;
+    void GenerateOneKnightMoves(int position) const;
+    void GenerateOneBishopMoves(int position) const;
+    void GenerateOneRookMoves(int position) const;
+    void GenerateOneQueenMoves(int position) const;
+    void GenerateOneKingMoves(int position) const;
 
     std::vector<int> GeneratePawnCaptures() const;
     std::vector<int> GenerateKnightCaptures() const;

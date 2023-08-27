@@ -13,30 +13,26 @@ void MoveGenerationTest(int depth, Board* board, Renderer* renderer)
         return;
     }
 
-    std::vector<Piece*> pieces = board->board;
+    std::unordered_map<int, std::vector<Move*>> moveMap = board->moveMap;
+    for (const auto& pair : moveMap) {
+        auto moves = pair.second;
+        if (depth == 1) {
+            moveCount += moves.size();
+        }
+        for (auto move : moves) {
 
-    for (const auto& piece : pieces) {
-
-        if (piece == nullptr)
-            continue;
-        if (piece->color == board->turn) {
-            std::vector<Move*> moves = piece->getMoves();
-            if (depth == 1) {
-                moveCount += moves.size();
+            board->makeMove(move);
+            if (depth != 1) {
+                board->gameLoop();
             }
-            for (auto move : moves) {
-                board->movePiece(move);
-                if (depth != 1) {
-                    board->gameLoop();
-                }
-                //BeginDrawing();
-                //renderer->render();
-                //EndDrawing();
-                MoveGenerationTest(depth - 1, board, renderer);
-                board->undoMove(*move);
-            }
+            //BeginDrawing();
+            //renderer->render();
+            //EndDrawing();
+            MoveGenerationTest(depth - 1, board, renderer);
+            board->undoMove(*move);
         }
     }
+
 }
 
 int main(int argc, char** argv)
@@ -52,7 +48,7 @@ int main(int argc, char** argv)
     auto* renderer = new Renderer(board);
 
     Vector2 mousePosition = {0, 0};
-    for (int i = 1; i < 5; i++) {
+    for (int i = 1; i < 1; i++) {
         // Start the timer
         auto start = std::chrono::high_resolution_clock::now();
         MoveGenerationTest(i, board->board, renderer);
@@ -62,7 +58,6 @@ int main(int argc, char** argv)
         board->board->gameLoop();
     }
 
-    board->drawingBoard = board->board->board;
     while (!WindowShouldClose())
     {
         mousePosition = GetMousePosition();

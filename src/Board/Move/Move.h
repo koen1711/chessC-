@@ -12,8 +12,8 @@ class Piece;
 class Move {
 public:
     Move(int from, int to, Board* board);
-    Piece* movedPiece = nullptr;
-    Piece* capturedPiece = nullptr;
+    PieceType movedPiece = NONE;
+    PieceType capturedPiece = NONE;
     bool firstMove = false;
     bool isCastle = false;
     bool isEnPassant = false;

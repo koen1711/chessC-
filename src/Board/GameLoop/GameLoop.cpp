@@ -31,20 +31,26 @@ void GameLoop::gameLoop() {
 
 void GameLoop::checkForCheck() {
     // Get the king
-    Piece* king = board->pieces[board->kings.at(board->turn)];
+    int king;
+    if (board->turn == ChessColor::COLORWHITE) {
+        king = board->whiteKing;
+    } else {
+        king = board->blackKing;
+    }
+    ChessColor kingColor = board->getPieceColor(king);
 
     // A function that checks if a piece is a threat to the king
     auto checkForThreat = [&](int pos, PieceType threatType) {
-        if (board->board[pos] != nullptr) {
-            Piece *piece = board->board[pos];
-            if (piece->color == king->color) {
+        PieceType pieceType = board->getPieceType(pos);
+        if (pieceType != NONE) {
+            if (board->getPieceColor(pos) == kingColor) {
                 return false;
             }
-            if (piece->name == threatType) {
-                attackingPieces.push_back(piece);
+            if (pieceType == threatType) {
+                attackingPieces.push_back(pos);
                 board->inCheck = true;
                 board->amountOfChecks++;
-                if (piece->name == PieceType::KNIGHT) {
+                if (pieceType == PieceType::KNIGHT) {
                     board->knightChecked = true;
                 }
                 return true;
@@ -54,48 +60,43 @@ void GameLoop::checkForCheck() {
     };
 
     // Check for threats use a loop for each diagonal, horizontal, and vertical starting from the king
-    const int kingPos = king->position;
-    const int kingRow = kingPos / 8;
-    const int kingCol = kingPos % 8;
+    const int kingRow = king / 8;
+    const int kingCol = king % 8;
 
     // Check if the king is in check by a pawn
-    if (king->color == ChessColor::COLORBLACK) {
-        if (kingPos + 7 < 64 && kingCol != 7) {
-            if (board->board[kingPos + 7] != nullptr) {
-                if (board->board[kingPos + 7]->color != king->color &&
-                    board->board[kingPos + 7]->name == PieceType::PAWN) {
-                    attackingPieces.push_back(board->board[kingPos + 7]);
+    if (kingColor == ChessColor::COLORBLACK) {
+        if (king + 7 < 64 && kingCol != 7) {
+            if (board->getPieceType(king + 7) == PieceType::PAWN) {
+                if (board->getPieceColor(king + 7) != kingColor) {
+                    attackingPieces.push_back(king + 7);
                     board->inCheck = true;
                     board->amountOfChecks++;
                 }
             }
         }
-        if (kingPos + 9 < 64 && kingCol != 0) {
-            if (board->board[kingPos + 9] != nullptr) {
-                if (board->board[kingPos + 9]->color != king->color &&
-                    board->board[kingPos + 9]->name == PieceType::PAWN) {
-                    attackingPieces.push_back(board->board[kingPos + 9]);
+        if (king + 9 < 64 && kingCol != 0) {
+            if (board->getPieceType(king + 9) == PAWN) {
+                if (board->getPieceColor(king + 9) != kingColor) {
+                    attackingPieces.push_back(king + 9);
                     board->inCheck = true;
                     board->amountOfChecks++;
                 }
             }
         }
     } else {
-        if (kingPos - 7 >= 0 && kingCol != 0) {
-            if (board->board[kingPos - 7] != nullptr) {
-                if (board->board[kingPos - 7]->color != king->color &&
-                    board->board[kingPos - 7]->name == PieceType::PAWN) {
-                    attackingPieces.push_back(board->board[kingPos - 7]);
+        if (king - 7 >= 0 && kingCol != 0) {
+            if (board->getPieceType(king - 7) == PAWN) {
+                if (board->getPieceColor(king - 7) != kingColor) {
+                    attackingPieces.push_back(king - 7);
                     board->inCheck = true;
                     board->amountOfChecks++;
                 }
             }
         }
-        if (kingPos - 9 >= 0 && kingCol != 7) {
-            if (board->board[kingPos - 9] != nullptr) {
-                if (board->board[kingPos - 9]->color != king->color &&
-                    board->board[kingPos - 9]->name == PieceType::PAWN) {
-                    attackingPieces.push_back(board->board[kingPos - 9]);
+        if (king - 9 >= 0 && kingCol != 7) {
+            if (board->getPieceType(king - 9) != PAWN) {
+                if (board->getPieceColor(king - 9) != kingColor) {
+                    attackingPieces.push_back(king - 9);
                     board->inCheck = true;
                     board->amountOfChecks++;
                 }
@@ -105,10 +106,10 @@ void GameLoop::checkForCheck() {
 
     // Diagonal
     if (kingCol != 7 && kingRow != 7) {
-        for (int i = kingPos; i < 64; i += 7) {
-            if (board->board[i] != nullptr) {
-                if (board->board[i]->color == king->color && i != kingPos) {
-                    pinnedPieces.emplace(board->board[i], Directions::DIAGONALDOWNRIGHT);
+        for (int i = king; i < 64; i += 7) {
+            if (board->getPieceType(i) != NONE) {
+                if (board->getPieceColor(i) == kingColor && i != king) {
+                    pinnedPieces.emplace(i, Directions::DIAGONALDOWNRIGHT);
                     break;
                 }
                 if (checkForThreat(i, PieceType::BISHOP) || checkForThreat(i, PieceType::QUEEN)) {
@@ -123,10 +124,10 @@ void GameLoop::checkForCheck() {
     }
 
     if (kingCol != 0 && kingRow != 7) {
-        for (int i = kingPos; i < 64; i += 9) {
-            if (board->board[i] != nullptr) {
-                if (board->board[i]->color == king->color && i != kingPos) {
-                    pinnedPieces.emplace(board->board[i], Directions::DIAGONALUPLEFT);
+        for (int i = king; i < 64; i += 9) {
+            if (board->getPieceType(i) != NONE) {
+                if (board->getPieceColor(i) == kingColor && i != king) {
+                    pinnedPieces.emplace(i, Directions::DIAGONALUPLEFT);
                     break;
                 }
                 if (checkForThreat(i, PieceType::BISHOP) || checkForThreat(i, PieceType::QUEEN)) {
@@ -141,10 +142,10 @@ void GameLoop::checkForCheck() {
     }
 
     if (kingCol != 7 && kingRow != 0) {
-        for (int i = kingPos; i >= 0; i -= 7) {
-            if (board->board[i] != nullptr) {
-                if (board->board[i]->color == king->color && i != kingPos) {
-                    pinnedPieces.emplace(board->board[i], Directions::DIAGONALUPRIGHT);
+        for (int i = king; i >= 0; i -= 7) {
+            if (board->getPieceType(i) != NONE) {
+                if (board->getPieceColor(i) == kingColor && i != king) {
+                    pinnedPieces.emplace(i, Directions::DIAGONALUPRIGHT);
                     break;
                 }
                 if (checkForThreat(i, PieceType::BISHOP) || checkForThreat(i, PieceType::QUEEN)) {
@@ -159,10 +160,10 @@ void GameLoop::checkForCheck() {
     }
 
     if (kingCol != 0 && kingRow != 0) {
-        for (int i = kingPos; i >= 0; i -= 9) {
-            if (board->board[i] != nullptr) {
-                if (board->board[i]->color == king->color && i != kingPos) {
-                    pinnedPieces.emplace(board->board[i], Directions::DIAGONALDOWNLEFT);
+        for (int i = king; i >= 0; i -= 9) {
+            if (board->getPieceType(i) != NONE) {
+                if (board->getPieceColor(i) == kingColor && i != king) {
+                    pinnedPieces.emplace(i, Directions::DIAGONALDOWNLEFT);
                     break;
                 }
                 if (checkForThreat(i, PieceType::BISHOP) || checkForThreat(i, PieceType::QUEEN)) {
@@ -178,10 +179,10 @@ void GameLoop::checkForCheck() {
 
     // Horizontal
     if (kingCol != 7) {
-        for (int i = kingPos; i < 64; i++) {
-            if (board->board[i] != nullptr) {
-                if (board->board[i]->color == king->color && i != kingPos) {
-                    pinnedPieces.emplace(board->board[i], Directions::HORIZONTALRIGHT);
+        for (int i = king; i < 64; i++) {
+            if (board->getPieceType(i) != NONE) {
+                if (board->getPieceColor(i) == kingColor && i != king) {
+                    pinnedPieces.emplace(i, Directions::HORIZONTALRIGHT);
                     break;
                 }
                 if (checkForThreat(i, PieceType::ROOK) || checkForThreat(i, PieceType::QUEEN)) {
@@ -196,10 +197,10 @@ void GameLoop::checkForCheck() {
     }
 
     if (kingCol != 0) {
-        for (int i = kingPos; i >= 0; i--) {
-            if (board->board[i] != nullptr) {
-                if (board->board[i]->color == king->color && i != kingPos) {
-                    pinnedPieces.emplace(board->board[i], Directions::HORIZONTALLEFT);
+        for (int i = king; i >= 0; i--) {
+            if (board->getPieceType(i) != NONE) {
+                if (board->getPieceColor(i) == kingColor && i != king) {
+                    pinnedPieces.emplace(i, Directions::HORIZONTALLEFT);
                     break;
                 }
                 if (checkForThreat(i, PieceType::ROOK) || checkForThreat(i, PieceType::QUEEN)) {
@@ -215,10 +216,10 @@ void GameLoop::checkForCheck() {
 
     // Vertical
     if (kingRow != 0) {
-        for (int i = kingPos; i < 64; i += 8) {
-            if (board->board[i] != nullptr) {
-                if (board->board[i]->color == king->color && i != kingPos) {
-                    pinnedPieces.emplace(board->board[i], Directions::VERTICALUP);
+        for (int i = king; i < 64; i += 8) {
+            if (board->getPieceType(i) != NONE) {
+                if (board->getPieceColor(i) == kingColor && i != king) {
+                    pinnedPieces.emplace(i, Directions::VERTICALUP);
                     break;
                 }
                 if (checkForThreat(i, PieceType::ROOK) || checkForThreat(i, PieceType::QUEEN)) {
@@ -230,10 +231,10 @@ void GameLoop::checkForCheck() {
     }
 
     if (kingRow != 7) {
-        for (int i = kingPos; i >= 0; i -= 8) {
-            if (board->board[i] != nullptr) {
-                if (board->board[i]->color == king->color && i != kingPos) {
-                    pinnedPieces.emplace(board->board[i], Directions::VERTICALDOWN);
+        for (int i = king; i >= 0; i -= 8) {
+            if (board->getPieceType(i) != NONE) {
+                if (board->getPieceColor(i) == kingColor && i != king) {
+                    pinnedPieces.emplace(i, Directions::VERTICALDOWN);
                     break;
                 }
                 if (checkForThreat(i, PieceType::ROOK) || checkForThreat(i, PieceType::QUEEN)) {
@@ -244,29 +245,29 @@ void GameLoop::checkForCheck() {
     }
 
     // Knight
-    if (kingPos + 17 < 64) {
-        checkForThreat(kingPos + 17, PieceType::KNIGHT);
+    if (king + 17 < 64) {
+        checkForThreat(king + 17, PieceType::KNIGHT);
     }
-    if (kingPos + 15 < 64) {
-        checkForThreat(kingPos + 15, PieceType::KNIGHT);
+    if (king + 15 < 64) {
+        checkForThreat(king + 15, PieceType::KNIGHT);
     }
-    if (kingPos + 10 < 64) {
-        checkForThreat(kingPos + 10, PieceType::KNIGHT);
+    if (king + 10 < 64) {
+        checkForThreat(king + 10, PieceType::KNIGHT);
     }
-    if (kingPos + 6 < 64) {
-        checkForThreat(kingPos + 6, PieceType::KNIGHT);
+    if (king + 6 < 64) {
+        checkForThreat(king + 6, PieceType::KNIGHT);
     }
-    if (kingPos - 6 >= 0) {
-        checkForThreat(kingPos - 6, PieceType::KNIGHT);
+    if (king - 6 >= 0) {
+        checkForThreat(king - 6, PieceType::KNIGHT);
     }
-    if (kingPos - 10 >= 0) {
-        checkForThreat(kingPos - 10, PieceType::KNIGHT);
+    if (king - 10 >= 0) {
+        checkForThreat(king - 10, PieceType::KNIGHT);
     }
-    if (kingPos - 15 >= 0) {
-        checkForThreat(kingPos - 15, PieceType::KNIGHT);
+    if (king - 15 >= 0) {
+        checkForThreat(king - 15, PieceType::KNIGHT);
     }
-    if (kingPos - 17 >= 0) {
-        checkForThreat(kingPos - 17, PieceType::KNIGHT);
+    if (king - 17 >= 0) {
+        checkForThreat(king - 17, PieceType::KNIGHT);
     }
 
     getPinnedPieces();
@@ -280,21 +281,25 @@ void GameLoop::generatePotentialMoves() {
         return;
     } else if (board->knightChecked) {
         for (const auto& piece : attackingPieces) {
-            if (piece == nullptr) {
-                continue;
-            } else if (piece->name == PieceType::KNIGHT && piece->color != board->turn) {
-                board->movesThatBlockCheck.push_back(piece->position);
+            if (board->getPieceType(piece) == PieceType::KNIGHT && piece != board->turn) {
+                board->movesThatBlockCheck.push_back(piece);
             }
         }
         return;
     }
 
     // Get the king
-    Piece* king = board->pieces[board->kings.at(board->turn)];
+
+    int king;
+    if (board->turn == ChessColor::COLORWHITE) {
+        king = board->whiteKing;
+    } else {
+        king = board->blackKing;
+    }
 
     for (auto attacker : attackingPieces) {
-        board->movesThatBlockCheck.push_back(attacker->position);
-        std::vector<int> positions = getPositionsBetween(attacker->position, king->position);
+        board->movesThatBlockCheck.push_back(attacker);
+        std::vector<int> positions = getPositionsBetween(attacker, king);
         board->movesThatBlockCheck.insert(board->movesThatBlockCheck.end(), positions.begin(), positions.end());
     }
 }
@@ -331,14 +336,13 @@ void GameLoop::getPinnedPieces() {
     for (auto pinnedPiece : pinnedPieces) {
         switch (pinnedPiece.second) {
             case Directions::DIAGONALUPLEFT:
-                for (int i = pinnedPiece.first->position; i < 64; i -= 9) {
-                    if (board->board[i] != nullptr) {
-                        if (board->board[i]->color == pinnedPiece.first->color && i != pinnedPiece.first->position) {
+                for (int i = pinnedPiece.first; i < 64; i -= 9) {
+                    if (board->getPieceType(i) != NONE) {
+                        if (board->getPieceColor(i) == pinnedPiece.first && i != pinnedPiece.first) {
                             break;
                         }
-                        if (board->board[i]->color != pinnedPiece.first->color && (board->board[i]->name == PieceType::BISHOP || board->board[i]->name == PieceType::QUEEN)) {
-                            pinnedPiece.first->pFlags->PINNED = true;
-                            pinnedPiece.first->pinDirection = Directions::DIAGONALUPLEFT;
+                        if (board->getPieceColor(i) != pinnedPiece.first && (board->getPieceType(i) == PieceType::BISHOP || board->getPieceType(i) == PieceType::QUEEN)) {
+                            //pinnedPiece.first->pinDirection = Directions::DIAGONALUPLEFT;
                             board->pinnedPieces.push_back(pinnedPiece.first);
                             break;
                         }
@@ -349,14 +353,13 @@ void GameLoop::getPinnedPieces() {
                 }
                 break;
             case Directions::DIAGONALUPRIGHT:
-                for (int i = pinnedPiece.first->position; i < 64; i -= 7) {
-                    if (board->board[i] != nullptr) {
-                        if (board->board[i]->color == pinnedPiece.first->color && i != pinnedPiece.first->position) {
+                for (int i = pinnedPiece.first; i < 64; i -= 7) {
+                    if (board->getPieceType(i) != NONE) {
+                        if (board->getPieceColor(i) == pinnedPiece.first && i != pinnedPiece.first) {
                             break;
                         }
-                        if (board->board[i]->color != pinnedPiece.first->color && (board->board[i]->name == PieceType::BISHOP || board->board[i]->name == PieceType::QUEEN)) {
-                            pinnedPiece.first->pFlags->PINNED = true;
-                            pinnedPiece.first->pinDirection = Directions::DIAGONALUPRIGHT;
+                        if (board->getPieceColor(i) != pinnedPiece.first && (board->getPieceType(i) == PieceType::BISHOP || board->getPieceType(i) == PieceType::QUEEN)) {
+                            //pinnedPiece.first->pinDirection = Directions::DIAGONALUPRIGHT;
                             board->pinnedPieces.push_back(pinnedPiece.first);
                             break;
                         }
@@ -367,14 +370,13 @@ void GameLoop::getPinnedPieces() {
                 }
                 break;
             case Directions::DIAGONALDOWNLEFT:
-                for (int i = pinnedPiece.first->position; i < 64; i += 7) {
-                    if (board->board[i] != nullptr) {
-                        if (board->board[i]->color == pinnedPiece.first->color && i != pinnedPiece.first->position) {
+                for (int i = pinnedPiece.first; i < 64; i += 7) {
+                    if (board->getPieceType(i) != NONE) {
+                        if (board->getPieceColor(i) == pinnedPiece.first && i != pinnedPiece.first) {
                             break;
                         }
-                        if (board->board[i]->color != pinnedPiece.first->color && (board->board[i]->name == PieceType::BISHOP || board->board[i]->name == PieceType::QUEEN)) {
-                            pinnedPiece.first->pFlags->PINNED = true;
-                            pinnedPiece.first->pinDirection = Directions::DIAGONALDOWNLEFT;
+                        if (board->getPieceColor(i) != pinnedPiece.first && (board->getPieceType(i) == PieceType::BISHOP || board->getPieceType(i) == PieceType::QUEEN)) {
+                            //pinnedPiece.first->pinDirection = Directions::DIAGONALDOWNLEFT;
                             board->pinnedPieces.push_back(pinnedPiece.first);
                             break;
                         }
@@ -385,14 +387,13 @@ void GameLoop::getPinnedPieces() {
                 }
                 break;
             case Directions::DIAGONALDOWNRIGHT:
-                for (int i = pinnedPiece.first->position; i < 64; i += 9) {
-                    if (board->board[i] != nullptr) {
-                        if (board->board[i]->color == pinnedPiece.first->color && i != pinnedPiece.first->position) {
+                for (int i = pinnedPiece.first; i < 64; i += 9) {
+                    if (board->getPieceType(i) != NONE) {
+                        if (board->getPieceColor(i) == pinnedPiece.first && i != pinnedPiece.first) {
                             break;
                         }
-                        if (board->board[i]->color != pinnedPiece.first->color && (board->board[i]->name == PieceType::BISHOP || board->board[i]->name == PieceType::QUEEN)) {
-                            pinnedPiece.first->pFlags->PINNED = true;
-                            pinnedPiece.first->pinDirection = Directions::DIAGONALDOWNRIGHT;
+                        if (board->getPieceColor(i) != pinnedPiece.first && (board->getPieceType(i) == PieceType::BISHOP || board->getPieceType(i) == PieceType::QUEEN)) {
+                            //pinnedPiece.first->pinDirection = Directions::DIAGONALDOWNRIGHT;
                             board->pinnedPieces.push_back(pinnedPiece.first);
                             break;
                         }
@@ -403,14 +404,13 @@ void GameLoop::getPinnedPieces() {
                 }
                 break;
             case Directions::HORIZONTALLEFT:
-                for (int i = pinnedPiece.first->position; i >= 0; i--) {
-                    if (board->board[i] != nullptr) {
-                        if (board->board[i]->color == pinnedPiece.first->color && i != pinnedPiece.first->position) {
+                for (int i = pinnedPiece.first; i >= 0; i--) {
+                    if (board->getPieceType(i) != NONE) {
+                        if (board->getPieceColor(i) == pinnedPiece.first && i != pinnedPiece.first) {
                             break;
                         }
-                        if (board->board[i]->color != pinnedPiece.first->color && (board->board[i]->name == PieceType::ROOK || board->board[i]->name == PieceType::QUEEN)) {
-                            pinnedPiece.first->pFlags->PINNED = true;
-                            pinnedPiece.first->pinDirection = Directions::HORIZONTALLEFT;
+                        if (board->getPieceColor(i) != pinnedPiece.first && (board->getPieceType(i) == PieceType::ROOK || board->getPieceType(i) == PieceType::QUEEN)) {
+                            //pinnedPiece.first->pinDirection = Directions::HORIZONTALLEFT;
                             board->pinnedPieces.push_back(pinnedPiece.first);
                             break;
                         }
@@ -421,14 +421,13 @@ void GameLoop::getPinnedPieces() {
                 }
                 break;
             case Directions::HORIZONTALRIGHT:
-                for (int i = pinnedPiece.first->position; i < 64; i++) {
-                    if (board->board[i] != nullptr) {
-                        if (board->board[i]->color == pinnedPiece.first->color && i != pinnedPiece.first->position) {
+                for (int i = pinnedPiece.first; i < 64; i++) {
+                    if (board->getPieceType(i) != NONE) {
+                        if (board->getPieceColor(i) == pinnedPiece.first && i != pinnedPiece.first) {
                             break;
                         }
-                        if (board->board[i]->color != pinnedPiece.first->color && (board->board[i]->name == PieceType::ROOK || board->board[i]->name == PieceType::QUEEN)) {
-                            pinnedPiece.first->pFlags->PINNED = true;
-                            pinnedPiece.first->pinDirection = Directions::HORIZONTALRIGHT;
+                        if (board->getPieceColor(i) != pinnedPiece.first && (board->getPieceType(i) == PieceType::ROOK || board->getPieceType(i) == PieceType::QUEEN)) {
+                            //pinnedPiece.first->pinDirection = Directions::HORIZONTALRIGHT;
                             board->pinnedPieces.push_back(pinnedPiece.first);
                             break;
                         }
@@ -439,14 +438,13 @@ void GameLoop::getPinnedPieces() {
                 }
                 break;
             case Directions::VERTICALUP:
-                for (int i = pinnedPiece.first->position; i < 64; i += 8) {
-                    if (board->board[i] != nullptr) {
-                        if (board->board[i]->color == pinnedPiece.first->color && i != pinnedPiece.first->position) {
+                for (int i = pinnedPiece.first; i < 64; i += 8) {
+                    if (board->getPieceType(i) != NONE) {
+                        if (board->getPieceColor(i) == pinnedPiece.first && i != pinnedPiece.first) {
                             break;
                         }
-                        if (board->board[i]->color != pinnedPiece.first->color && (board->board[i]->name == PieceType::ROOK || board->board[i]->name == PieceType::QUEEN)) {
-                            pinnedPiece.first->pFlags->PINNED = true;
-                            pinnedPiece.first->pinDirection = Directions::VERTICALUP;
+                        if (board->getPieceColor(i) != pinnedPiece.first && (board->getPieceType(i) == PieceType::ROOK || board->getPieceType(i) == PieceType::QUEEN)) {
+                            //pinnedPiece.first->pinDirection = Directions::VERTICALUP;
                             board->pinnedPieces.push_back(pinnedPiece.first);
                             break;
                         }
@@ -454,14 +452,13 @@ void GameLoop::getPinnedPieces() {
                 }
                 break;
             case Directions::VERTICALDOWN:
-                for (int i = pinnedPiece.first->position; i >= 0; i -= 8) {
-                    if (board->board[i] != nullptr) {
-                        if (board->board[i]->color == pinnedPiece.first->color && i != pinnedPiece.first->position) {
+                for (int i = pinnedPiece.first; i >= 0; i -= 8) {
+                    if (board->getPieceType(i) != NONE) {
+                        if (board->getPieceColor(i) == pinnedPiece.first && i != pinnedPiece.first) {
                             break;
                         }
-                        if (board->board[i]->color != pinnedPiece.first->color && (board->board[i]->name == PieceType::ROOK || board->board[i]->name == PieceType::QUEEN)) {
-                            pinnedPiece.first->pFlags->PINNED = true;
-                            pinnedPiece.first->pinDirection = Directions::VERTICALDOWN;
+                        if (board->getPieceColor(i) != pinnedPiece.first && (board->getPieceType(i) == PieceType::ROOK || board->getPieceType(i) == PieceType::QUEEN)) {
+                            //pinnedPiece.first->pinDirection = Directions::VERTICALDOWN;
                             board->pinnedPieces.push_back(pinnedPiece.first);
                             break;
                         }
@@ -480,9 +477,9 @@ void GameLoop::checkForCheckmate() {
     }
 }
 
-bool GameLoop::checkIfPieceProtected(Piece* p) {
+bool GameLoop::checkIfPieceProtected(int p) {
 
-    if (std::find(board->controlledSquares.begin(), board->controlledSquares.end(), p->position) != board->controlledSquares.end()) {
+    if (std::find(board->controlledSquares.begin(), board->controlledSquares.end(), p) != board->controlledSquares.end()) {
         return true;
     }
     return false;

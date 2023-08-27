@@ -14,14 +14,14 @@ class Piece;
 class GameLoop {
     private:
         Board* board;
-        std::vector<Piece*> attackingPieces;
-        std::map<Piece*, Directions> pinnedPieces;
+        std::vector<int> attackingPieces;
+        std::map<int, Directions> pinnedPieces;
 
         void checkForCheck();
         void getPinnedPieces();
         void generatePotentialMoves();
         void checkForCheckmate();
-        bool checkIfPieceProtected(Piece* p);
+        bool checkIfPieceProtected(int p);
 
     public:
         explicit GameLoop(Board* board);
