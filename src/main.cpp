@@ -19,7 +19,7 @@ void MoveGenerationTest(int depth, Board* board, Renderer* renderer)
         if (depth == 1) {
             moveCount += moves.size();
         }
-        for (auto move : moves) {
+        for (auto move: moves) {
 
             board->makeMove(move);
             if (depth != 1) {
@@ -32,7 +32,6 @@ void MoveGenerationTest(int depth, Board* board, Renderer* renderer)
             board->undoMove(*move);
         }
     }
-
 }
 
 int main(int argc, char** argv)
@@ -48,7 +47,7 @@ int main(int argc, char** argv)
     auto* renderer = new Renderer(board);
 
     Vector2 mousePosition = {0, 0};
-    for (int i = 1; i < 1; i++) {
+    for (int i = 1; i < 4; i++) {
         // Start the timer
         auto start = std::chrono::high_resolution_clock::now();
         MoveGenerationTest(i, board->board, renderer);

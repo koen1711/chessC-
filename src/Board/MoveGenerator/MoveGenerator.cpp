@@ -59,9 +59,9 @@ void MoveGenerator::GeneratePawnMoves() {
         // Remove the first pawn from the bitboard
         pawnsBitboard &= pawnsBitboard - 1ULL;
         // Generate the moves for the pawn
-
         // Get if this position is in the whitePiecesBitboard
-        GenerateOnePawnMoves(position, direction, startingRow, enPassantRight, enPassantLeft);
+        if (board->getPieceColor(position) == board->turn)
+            GenerateOnePawnMoves(position, direction, startingRow, enPassantRight, enPassantLeft);
     }
 }
 
@@ -171,7 +171,8 @@ void MoveGenerator::GenerateKnightMoves() {
         // Remove the first knight from the bitboard
         knightsBitboard &= knightsBitboard - 1ULL;
         // Generate the moves for the knight
-        GenerateOneKnightMoves(position);
+        if (board->getPieceColor(position) == board->turn)
+            GenerateOneKnightMoves(position);
     }
 }
 
@@ -315,7 +316,8 @@ void MoveGenerator::GenerateRookMoves() {
         // Remove the first rook from the bitboard
         rooksBitboard &= rooksBitboard - 1ULL;
         // Generate the moves for the rook
-        GenerateOneRookMoves(position);
+        if (board->getPieceColor(position) == board->turn)
+            GenerateOneRookMoves(position);
     }
 }
 
@@ -423,7 +425,8 @@ void MoveGenerator::GenerateBishopMoves() {
         // Remove the first bishop from the bitboard
         bishopsBitboard &= bishopsBitboard - 1ULL;
         // Generate the moves for the bishop
-        GenerateOneBishopMoves(position);
+        if (board->getPieceColor(position) == board->turn)
+            GenerateOneBishopMoves(position);
     }
 }
 
@@ -538,7 +541,8 @@ void MoveGenerator::GenerateQueenMoves() {
         // Remove the first queen from the bitboard
         queensBitboard &= queensBitboard - 1ULL;
         // Generate the moves for the queen
-        GenerateOneQueenMoves(position);
+        if (board->getPieceColor(position) == board->turn)
+            GenerateOneQueenMoves(position);
     }
 }
 
@@ -725,18 +729,13 @@ void MoveGenerator::GenerateOneQueenMoves( int position) const {
 
 void MoveGenerator::GenerateKingMoves() {
     int king;
-
-    uint64_t kingBitboard = board->kingsBitboard;
-
-    while (kingBitboard) {
-        if (board->turn == ChessColor::COLORWHITE) {
-            king = board->whiteKing;
-        } else {
-            king = board->blackKing;
-        }
-        GenerateOneKingMoves(king);
-        kingBitboard &= kingBitboard - 1ULL;
+    if (board->turn == ChessColor::COLORWHITE) {
+        king = board->whiteKing;
+    } else {
+        king = board->blackKing;
     }
+    GenerateOneKingMoves(king);
+
 }
 
 void MoveGenerator::GenerateOneKingMoves( int position) const {
@@ -857,6 +856,10 @@ std::vector<int> MoveGenerator::GeneratePawnCaptures() const {
     while (pawnsBitboard) {
         // Get the position of the first pawn
         int position = __builtin_ctzll(board->pawnsBitboard);
+        if (board->getPieceColor(position) != board->turn) {
+            pawnsBitboard &= pawnsBitboard - 1ULL;
+            continue;
+        }
         const int row = position / 8;
         const int column = position % 8;
         if (board->getPieceColor(position) == ChessColor::COLORWHITE) {
@@ -886,6 +889,10 @@ std::vector<int> MoveGenerator::GenerateKnightCaptures() const {
 
     while (knightsBitboard) {
         const int position = __builtin_ctzll(knightsBitboard);
+        if (board->getPieceColor(position) != board->turn) {
+            knightsBitboard &= knightsBitboard - 1ULL;
+            continue;
+        }
         // Generate all moves, don't check if they are vali
         const int row = position / 8;
         const int column = position % 8;
@@ -942,6 +949,10 @@ std::vector<int> MoveGenerator::GenerateBishopCaptures() const {
 
     while (bishopsBitboard) {
         const int position = __builtin_ctzll(bishopsBitboard);
+        if (board->getPieceColor(position) != board->turn) {
+            bishopsBitboard &= bishopsBitboard - 1ULL;
+            continue;
+        }
         // Generate all moves, don't check if they are valid
         int row = position / 8;
         int column = position % 8;
@@ -1023,6 +1034,10 @@ std::vector<int> MoveGenerator::GenerateRookCaptures() const {
 
     while (rooksBitboard) {
         const int position = __builtin_ctzll(rooksBitboard);
+        if (board->getPieceColor(position) != board->turn) {
+            rooksBitboard &= rooksBitboard - 1ULL;
+            continue;
+        }
         // Generate all moves, don't check if they are valid
         int row = position / 8;
         int column = position % 8;
@@ -1083,6 +1098,10 @@ std::vector<int> MoveGenerator::GenerateQueenCaptures() const {
 
     while (queensBitboard) {
         const int position = __builtin_ctzll(queensBitboard);
+        if (board->getPieceColor(position) != board->turn) {
+            queensBitboard &= queensBitboard - 1ULL;
+            continue;
+        }
         // Generate all moves, don't check if they are valid
         int row = position / 8;
         int column = position % 8;
@@ -1190,6 +1209,10 @@ std::vector<int> MoveGenerator::GenerateKingCaptures() const {
 
     while (kingsBitboard) {
         const int position = __builtin_ctzll(kingsBitboard);
+        if (board->getPieceColor(position) != board->turn) {
+            kingsBitboard &= kingsBitboard - 1ULL;
+            continue;
+        }
         const int row = position / 8;
         const int column = position % 8;
         // Check if king can move 1 row up

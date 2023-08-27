@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Move.h"
 #include "../Setup/Setup.h"
 

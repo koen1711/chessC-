@@ -78,8 +78,6 @@ void Board::makeMove(Move* move) {
     int from = move->fromSquare;
     int to = move->toSquare;
 
-    movePiece(from, to);
-
     // Handle castling separately
     if (move->isCastle) {
         std::cout << "Castling" << std::endl;
@@ -149,6 +147,7 @@ void Board::makeMove(Move* move) {
         promotePawn(to);
     }
 
+    movePiece(from, to);
     //pieceToMove->pFlags->MOVED = true;
     //board[to] = pieceToMove;
     //board[from] = nullptr;
@@ -161,6 +160,10 @@ void Board::makeMove(Move* move) {
 void Board::undoMove(const Move &move) {
     int from = move.fromSquare;
     int to = move.toSquare;
+
+    if (move.movedPiece != NONE) {
+        movePiece(to, from);
+    }
 
     // Move the piece back to its original position
     if (move.capturedPiece != NONE) {
@@ -188,20 +191,17 @@ void Board::undoMove(const Move &move) {
                 break;
         }
 
-        if (getPieceColor(to) == ChessColor::COLORWHITE) {
+        if (getPieceColor(from) == ChessColor::COLORBLACK) {
             whitePiecesBitboard |= (1ULL << to);
         } else {
             blackPiecesBitboard |= (1ULL << to);
         }
     }
 
-    if (move.movedPiece != NONE) {
-        movePiece(to, from);
-    }
 
     // Handle castling separately
     if (move.isCastle) {
-        int rookFrom, rookTo;
+        int rookFrom, rookTo = -1;
         if (to == 62) { // White kingside castle
             rookFrom = 63;
             rookTo = 61;
@@ -214,12 +214,11 @@ void Board::undoMove(const Move &move) {
         } else if (to == 2) { // Black queenside castle
             rookFrom = 0;
             rookTo = 3;
-        } else {
-            // Invalid castle move
-            return;
         }
 
-        movePiece(rookTo, rookFrom);
+        if (rookTo != -1) {
+            movePiece(rookTo, rookFrom);
+        }
     }
 
     // Handle en passant
@@ -231,11 +230,10 @@ void Board::undoMove(const Move &move) {
             capturedPawnPos = to - 8;
         }
         // Restore the captured pawn
-        if (turn == ChessColor::COLORBLACK) {
-            pawnsBitboard |= (1ULL << capturedPawnPos);
+        pawnsBitboard |= (1ULL << capturedPawnPos);
+        if (getPieceColor(from) == ChessColor::COLORBLACK) {
             whitePiecesBitboard |= (1ULL << capturedPawnPos);
         } else {
-            pawnsBitboard |= (1ULL << capturedPawnPos);
             blackPiecesBitboard |= (1ULL << capturedPawnPos);
         }
     }
@@ -295,6 +293,8 @@ void Board::removePiece(int position) {
             break;
         case PieceType::KING:
             kingsBitboard &= ~(1ULL << position);
+            break;
+        case NONE:
             break;
     }
 }
