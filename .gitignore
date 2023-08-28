@@ -1,6 +1,7 @@
 build/
 bin/
-cmake-build-debug/
+cmake-build-release/
+cmake-debug-build/
 CMakeFiles/
 .idea/
 .cmake/
