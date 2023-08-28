@@ -12,6 +12,7 @@ class Piece;
 class Move {
 public:
     Move(int from, int to, Board* board);
+    ChessColor movedColor = COLORWHITE;
     PieceType movedPiece = NONE;
     PieceType capturedPiece = NONE;
     bool firstMove = false;

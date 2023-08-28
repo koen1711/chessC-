@@ -5,6 +5,7 @@
 Move::Move(int from, int to, Board* board) : fromSquare(from), toSquare(to)  {
     movedPiece = board->getPieceType(from);
     capturedPiece = board->getPieceType(to);
+    movedColor = board->getPieceColor(from);
 
     // Check if the move is a castle
     if (movedPiece == PieceType::KING && abs(from - to) == 2) {

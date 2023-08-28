@@ -29,7 +29,7 @@ void MoveGenerationTest(int depth, Board* board, Renderer* renderer)
             //renderer->render();
             //EndDrawing();
             MoveGenerationTest(depth - 1, board, renderer);
-            board->undoMove(*move);
+            board->undoMove(move);
         }
     }
 }

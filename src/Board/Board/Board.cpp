@@ -123,17 +123,17 @@ void Board::makeMove(Move* move) {
 
     if (move->isPawnDoubleMove) {
         // get the pawns that are next to the pawn that moved
-        int leftPawnPos = to - 1;
-        int rightPawnPos = to + 1;
+        int leftPawnPos = to + 1;
+        int rightPawnPos = to - 1;
         // check if there are pawns and if so set the en passant flag
-        if (getPieceType(leftPawnPos) == PieceType::PAWN && getPieceColor(leftPawnPos) != getPieceColor(to)) {
+        if (getPieceType(leftPawnPos) == PieceType::PAWN && getPieceColor(leftPawnPos) != move->movedColor) {
             // check if we are in the right column
             if (leftPawnPos % 8 != 7) {
                 // Get if relative for the other pawn if it is left or right
                 enPassantLeftBitboard |= (1ULL << leftPawnPos);
             }
         }
-        if (getPieceType(rightPawnPos)  == PieceType::PAWN && getPieceColor(rightPawnPos) != getPieceColor(to)) {
+        if (getPieceType(rightPawnPos)  == PieceType::PAWN && getPieceColor(rightPawnPos) != move->movedColor) {
             // Get if relative for the other pawn if it is left or right
             if (rightPawnPos % 8 != 0) {
                 enPassantRightBitboard |= (1ULL << rightPawnPos);
@@ -153,22 +153,20 @@ void Board::makeMove(Move* move) {
     //board[from] = nullptr;
     //pieceToMove->moves.clear();
     moveGenerator->GenerateCapturesOnly();
-    turn = (turn == ChessColor::COLORWHITE) ? ChessColor::COLORBLACK : ChessColor::COLORWHITE;
+    turn = (move->movedColor == ChessColor::COLORWHITE) ? ChessColor::COLORBLACK : ChessColor::COLORWHITE;
     moveMap.clear();
 }
 
-void Board::undoMove(const Move &move) {
-    int from = move.fromSquare;
-    int to = move.toSquare;
+void Board::undoMove(Move* move) {
+    int from = move->fromSquare;
+    int to = move->toSquare;
 
-    if (move.movedPiece != NONE) {
-        movePiece(to, from);
-    }
+    movePiece(to, from);
 
     // Move the piece back to its original position
-    if (move.capturedPiece != NONE) {
+    if (move->capturedPiece != NONE) {
         // Restore the captured piece if there was any
-        switch (move.capturedPiece) {
+        switch (move->capturedPiece) {
             case PieceType::PAWN:
                 pawnsBitboard |= (1ULL << to);
                 break;
@@ -187,11 +185,11 @@ void Board::undoMove(const Move &move) {
             case PieceType::KING:
                 kingsBitboard |= (1ULL << to);
                 break;
-            case NONE:
+            case PieceType::NONE:
                 break;
         }
 
-        if (getPieceColor(from) == ChessColor::COLORBLACK) {
+        if (move->movedColor == ChessColor::COLORBLACK) {
             whitePiecesBitboard |= (1ULL << to);
         } else {
             blackPiecesBitboard |= (1ULL << to);
@@ -200,7 +198,7 @@ void Board::undoMove(const Move &move) {
 
 
     // Handle castling separately
-    if (move.isCastle) {
+    if (move->isCastle) {
         int rookFrom, rookTo = -1;
         if (to == 62) { // White kingside castle
             rookFrom = 63;
@@ -222,32 +220,32 @@ void Board::undoMove(const Move &move) {
     }
 
     // Handle en passant
-    if (move.isEnPassant) {
+    if (move->isEnPassant) {
         int capturedPawnPos;
-        if (turn == ChessColor::COLORWHITE) {
+        if (move->movedColor == ChessColor::COLORWHITE) {
             capturedPawnPos = to + 8;
         } else {
             capturedPawnPos = to - 8;
         }
         // Restore the captured pawn
         pawnsBitboard |= (1ULL << capturedPawnPos);
-        if (getPieceColor(from) == ChessColor::COLORBLACK) {
+        if (move->movedColor == ChessColor::COLORBLACK) {
             whitePiecesBitboard |= (1ULL << capturedPawnPos);
         } else {
             blackPiecesBitboard |= (1ULL << capturedPawnPos);
         }
     }
 
-    if (move.isPawnDoubleMove) {
+    if (move->isPawnDoubleMove) {
         // Check if the pawn next to the pawn that moved has the en passant flag
-        int leftPawnPos = to - 1;
-        int rightPawnPos = to + 1;
-        if (getPieceType(rightPawnPos) == PieceType::PAWN && getPieceColor(rightPawnPos) != getPieceColor(to)) {
+        int leftPawnPos = to + 1;
+        int rightPawnPos = to - 1;
+        if (getPieceType(rightPawnPos) == PieceType::PAWN && getPieceColor(rightPawnPos) != move->movedColor) {
             if (leftPawnPos % 8 != 7) {
                 enPassantLeftBitboard &= ~(1ULL << leftPawnPos);
             }
         }
-        if (getPieceType(rightPawnPos) == PieceType::PAWN && getPieceColor(rightPawnPos) != getPieceColor(to)) {
+        if (getPieceType(rightPawnPos) == PieceType::PAWN && getPieceColor(rightPawnPos) != move->movedColor) {
             if (rightPawnPos % 8 != 0) {
                 enPassantLeftBitboard &= ~(1ULL << rightPawnPos);
             }
@@ -255,7 +253,7 @@ void Board::undoMove(const Move &move) {
     }
 
     // Handle promotion
-    if (move.isPromotion) {
+    if (move->isPromotion) {
         // Replace the promoted piece with the original pawn
         //pieceToMove = new Pawn(pieceToMove->color, move.fromSquare);
         //board[to] = pieceToMove;
@@ -265,16 +263,11 @@ void Board::undoMove(const Move &move) {
 
     moveGenerator->GenerateCapturesOnly();
     // Update the turn
-    turn = getPieceColor(from);
+    turn = move->movedColor;
     gameLoop();
 }
 
 void Board::removePiece(int position) {
-    if (getPieceColor(position) == ChessColor::COLORWHITE) {
-        whitePiecesBitboard &= ~(1ULL << position);
-    } else {
-        blackPiecesBitboard &= ~(1ULL << position);
-    }
     switch (getPieceType(position)) {
         case PieceType::PAWN:
             pawnsBitboard &= ~(1ULL << position);
@@ -296,6 +289,11 @@ void Board::removePiece(int position) {
             break;
         case NONE:
             break;
+    }
+    if (getPieceColor(position) == ChessColor::COLORWHITE) {
+        whitePiecesBitboard &= ~(1ULL << position);
+    } else {
+        blackPiecesBitboard &= ~(1ULL << position);
     }
 }
 
@@ -340,27 +338,28 @@ void Board::movePiece(int from, int to) {
 
 void Board::promotePawn(int position) {}
 
-PieceType Board::getPieceType(int position) const {
-    if (pawnsBitboard & (1ULL << position)) {
+PieceType Board::getPieceType(int position) {
+    if (this->pawnsBitboard & (1ULL << position)) {
         return PieceType::PAWN;
-    } else if (knightsBitboard & (1ULL << position)) {
+    } else if (this->knightsBitboard & (1ULL << position)) {
         return PieceType::KNIGHT;
-    } else if (bishopsBitboard & (1ULL << position)) {
+    } else if (this->bishopsBitboard & (1ULL << position)) {
         return PieceType::BISHOP;
-    } else if (rooksBitboard & (1ULL << position)) {
+    } else if (this->rooksBitboard & (1ULL << position)) {
         return PieceType::ROOK;
-    } else if (queensBitboard & (1ULL << position)) {
+    } else if (this->queensBitboard & (1ULL << position)) {
         return PieceType::QUEEN;
-    } else if (kingsBitboard & (1ULL << position)) {
+    } else if (this->kingsBitboard & (1ULL << position)) {
         return PieceType::KING;
     }
     return PieceType::NONE;
 }
 
-ChessColor Board::getPieceColor(int position) const {
+ChessColor Board::getPieceColor(int position) {
     if (whitePiecesBitboard & (1ULL << position)) {
         return ChessColor::COLORWHITE;
     } else if (blackPiecesBitboard & (1ULL << position)) {
         return ChessColor::COLORBLACK;
     }
+    return ChessColor::COLORNONE;
 }

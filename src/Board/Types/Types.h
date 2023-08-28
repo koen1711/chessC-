@@ -5,7 +5,8 @@
 
 enum ChessColor {
     COLORWHITE = 0,
-    COLORBLACK = 1
+    COLORBLACK = 1,
+    COLORNONE = 2
 };
 
 enum PieceType {
@@ -19,11 +20,6 @@ enum PieceType {
 };
 
 struct PieceFlags {
-    bool MOVED = false;
-    bool ENPASSANTLEFT = false;
-    bool ENPASSANTRIGHT = false;
-    bool CASTLED = false;
-    bool PINNED = false;
 
 };
 

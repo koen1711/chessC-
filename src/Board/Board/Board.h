@@ -62,10 +62,10 @@ public:
 
     MoveGenerator* moveGenerator;
 
-    void undoMove(const Move &move);
+    void undoMove(Move* move);
 
-    PieceType getPieceType(int position) const;
-    ChessColor getPieceColor(int position) const;
+    PieceType getPieceType(int position);
+    ChessColor getPieceColor(int position);
 
     void movePiece(int from, int to);
 };

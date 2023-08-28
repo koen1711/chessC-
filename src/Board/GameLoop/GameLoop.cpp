@@ -24,7 +24,6 @@ void GameLoop::gameLoop() {
     board->amountOfChecks = 0;
     board->knightChecked = false;
     attackingPieces.clear();
-    pinnedPieces.clear();
     checkForCheck();
     checkForCheckmate();
 }
@@ -468,6 +467,7 @@ void GameLoop::getPinnedPieces() {
                 break;
         }
     }
+    pinnedPieces.clear();
 }
 
 void GameLoop::checkForCheckmate() {
