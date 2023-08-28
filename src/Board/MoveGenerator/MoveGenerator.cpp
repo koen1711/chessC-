@@ -18,19 +18,20 @@ MoveGenerator::MoveGenerator(Board* board) : board(board) {};
 
 
 void MoveGenerator::GenerateCapturesOnly() {
-    board->controlledSquares.clear();
-    std::vector<int> pawnCaptures = GeneratePawnCaptures();
-    board->controlledSquares.insert(board->controlledSquares.end(), pawnCaptures.begin(), pawnCaptures.end());
-    std::vector<int> knightCaptures = GenerateKnightCaptures();
-    board->controlledSquares.insert(board->controlledSquares.end(), knightCaptures.begin(), knightCaptures.end());
-    std::vector<int> bishopCaptures = GenerateBishopCaptures();
-    board->controlledSquares.insert(board->controlledSquares.end(), bishopCaptures.begin(), bishopCaptures.end());
-    std::vector<int> rookCaptures = GenerateRookCaptures();
-    board->controlledSquares.insert(board->controlledSquares.end(), rookCaptures.begin(), rookCaptures.end());
-    std::vector<int> queenCaptures = GenerateQueenCaptures();
-    board->controlledSquares.insert(board->controlledSquares.end(), queenCaptures.begin(), queenCaptures.end());
-    std::vector<int> kingCaptures = GenerateKingCaptures();
-    board->controlledSquares.insert(board->controlledSquares.end(), kingCaptures.begin(), kingCaptures.end());
+    board->controlledSquaresBitboard = 0ULL;
+    uint64_t pawnCaptures = GeneratePawnCaptures();
+    // Add the pawn captures to the board->controlledSquaresBitboard
+    board->controlledSquaresBitboard |= pawnCaptures;
+    uint64_t knightCaptures = GenerateKnightCaptures();
+    board->controlledSquaresBitboard |= knightCaptures;
+    uint64_t bishopCaptures = GenerateBishopCaptures();
+    board->controlledSquaresBitboard |= bishopCaptures;
+    uint64_t rookCaptures = GenerateRookCaptures();
+    board->controlledSquaresBitboard |= rookCaptures;
+    uint64_t queenCaptures = GenerateQueenCaptures();
+    board->controlledSquaresBitboard |= queenCaptures;
+    uint64_t kingCaptures = GenerateKingCaptures();
+    board->controlledSquaresBitboard |= kingCaptures;
 }
 
 void MoveGenerator::GenerateMoves() {
@@ -75,7 +76,7 @@ void MoveGenerator::GenerateOnePawnMoves(int position, int direction, int starti
     if (board->getPieceType(forwardOneSquare) == NONE) {
         // Check if pawn can promote
         if (board->inCheck) {
-            if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), forwardOneSquare) != board->movesThatBlockCheck.end()) {
+            if (board->movesThatBlockCheckBitboard & (1ULL << forwardOneSquare)) {
                 pawnMoves.push_back(new Move(position, forwardOneSquare, board));
             }
         } else {
@@ -85,7 +86,7 @@ void MoveGenerator::GenerateOnePawnMoves(int position, int direction, int starti
             int forwardTwoSquares = position + (direction * 16);
             if (board->getPieceType(forwardTwoSquares) == NONE) {
                 if (board->inCheck) {
-                    if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), forwardTwoSquares) != board->movesThatBlockCheck.end()) {
+                    if (board->movesThatBlockCheckBitboard & (1ULL << forwardTwoSquares)) {
                         pawnMoves.push_back(new Move(position, forwardTwoSquares, board));
                     }
                 } else {
@@ -96,7 +97,7 @@ void MoveGenerator::GenerateOnePawnMoves(int position, int direction, int starti
     }
     if (board->enPassantRightBitboard & (1ULL << position)) {
         if (board->inCheck) {
-            if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), position + (direction * enPassantRight)) != board->movesThatBlockCheck.end()) {
+            if (board->movesThatBlockCheckBitboard & (1ULL << (position + (direction * enPassantRight)))) {
                 pawnMoves.push_back(new Move(position, position + (direction * enPassantRight), board));
             }
         } else {
@@ -105,7 +106,7 @@ void MoveGenerator::GenerateOnePawnMoves(int position, int direction, int starti
     }
     if (board->enPassantLeftBitboard & (1ULL << position)) {
         if (board->inCheck) {
-            if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), position + (direction * enPassantLeft)) != board->movesThatBlockCheck.end()) {
+            if (board->movesThatBlockCheckBitboard & (1ULL << (position + (direction * enPassantLeft)))) {
                 pawnMoves.push_back(new Move(position, position + (direction * enPassantLeft), board));
             }
         } else {
@@ -118,7 +119,7 @@ void MoveGenerator::GenerateOnePawnMoves(int position, int direction, int starti
         int rightCapture = boardArray[row + (1 * direction)][column + 1];
         if (board->getPieceType(rightCapture) != NONE && board->getPieceColor(rightCapture) != board->turn) {
             if (board->inCheck) {
-                if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), rightCapture) != board->movesThatBlockCheck.end()) {
+                if (board->movesThatBlockCheckBitboard & (1ULL << rightCapture)) {
                     pawnMoves.push_back(new Move(position, rightCapture, board));
                 }
             } else {
@@ -131,7 +132,7 @@ void MoveGenerator::GenerateOnePawnMoves(int position, int direction, int starti
         int leftCapture = boardArray[row + 1 * direction][column - 1];
         if (board->getPieceType(leftCapture) != NONE && board->getPieceColor(leftCapture) != board->turn) {
             if (board->inCheck) {
-                if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), leftCapture) != board->movesThatBlockCheck.end()) {
+                if (board->movesThatBlockCheckBitboard & (1ULL << leftCapture)) {
                     pawnMoves.push_back(new Move(position, leftCapture, board));
                 }
             } else {
@@ -142,7 +143,7 @@ void MoveGenerator::GenerateOnePawnMoves(int position, int direction, int starti
 
     if (board->enPassantLeftBitboard & (1ULL << position)) {
         if (board->inCheck) {
-            if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), position + (direction * enPassantLeft)) != board->movesThatBlockCheck.end()) {
+            if (board->movesThatBlockCheckBitboard & (1ULL << (position + (direction * enPassantLeft)))) {
                 pawnMoves.push_back(new Move(position, position + (direction * enPassantLeft), board));
             }
         } else {
@@ -150,7 +151,7 @@ void MoveGenerator::GenerateOnePawnMoves(int position, int direction, int starti
         }
     } else if (board->enPassantRightBitboard & (1ULL << position)) {
         if (board->inCheck) {
-            if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), position + (direction * enPassantRight)) != board->movesThatBlockCheck.end()) {
+            if (board->movesThatBlockCheckBitboard & (1ULL << (position + (direction * enPassantRight)))) {
                 pawnMoves.push_back(new Move(position, position + (direction * enPassantRight), board));
             }
         } else {
@@ -188,8 +189,7 @@ void MoveGenerator::GenerateOneKnightMoves(int position) const {
         if (column < 7) {
             int move = position + 17;
             if (board->inCheck) {
-                if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) !=
-                    board->movesThatBlockCheck.end()) {
+                if (board->movesThatBlockCheckBitboard & (1ULL << move)) {
                     if (board->getPieceType(move) == NONE || board->getPieceColor(move) != color) {
                         knightMoves.push_back(new Move(position, move, board));
                     }
@@ -202,8 +202,7 @@ void MoveGenerator::GenerateOneKnightMoves(int position) const {
         if (column > 0) {
             int move = position + 15;
             if (board->inCheck) {
-                if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) !=
-                    board->movesThatBlockCheck.end()) {
+                if (board->movesThatBlockCheckBitboard & (1ULL << move)) {
                     if (board->getPieceType(move) == NONE || board->getPieceColor(move) != color) {
                         knightMoves.push_back(new Move(position, move, board));
                     }
@@ -218,8 +217,7 @@ void MoveGenerator::GenerateOneKnightMoves(int position) const {
         if (column < 7) {
             int move = position - 15;
             if (board->inCheck) {
-                if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) !=
-                    board->movesThatBlockCheck.end()) {
+                if (board->movesThatBlockCheckBitboard & (1ULL << move)) {
                     if (board->getPieceType(move) == NONE || board->getPieceColor(move) != color) {
                         knightMoves.push_back(new Move(position, move, board));
                     }
@@ -232,8 +230,7 @@ void MoveGenerator::GenerateOneKnightMoves(int position) const {
         if (column > 0) {
             int move = position - 17;
             if (board->inCheck) {
-                if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) !=
-                    board->movesThatBlockCheck.end()) {
+                if (board->movesThatBlockCheckBitboard & (1ULL << move)) {
                     if (board->getPieceType(move) == NONE || board->getPieceColor(move) != color) {
                         knightMoves.push_back(new Move(position, move, board));
                     }
@@ -248,8 +245,7 @@ void MoveGenerator::GenerateOneKnightMoves(int position) const {
         if (column < 6) {
             int move = position + 10;
             if (board->inCheck) {
-                if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) !=
-                    board->movesThatBlockCheck.end()) {
+                if (board->movesThatBlockCheckBitboard & (1ULL << move)) {
                     if (board->getPieceType(move) == NONE || board->getPieceColor(move) != color) {
                         knightMoves.push_back(new Move(position, move, board));
                     }
@@ -262,8 +258,7 @@ void MoveGenerator::GenerateOneKnightMoves(int position) const {
         if (column > 1) {
             int move = position + 6;
             if (board->inCheck) {
-                if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) !=
-                    board->movesThatBlockCheck.end()) {
+                if (board->movesThatBlockCheckBitboard & (1ULL << move)) {
                     if (board->getPieceType(move) == NONE || board->getPieceColor(move) != color) {
                         knightMoves.push_back(new Move(position, move, board));
                     }
@@ -278,8 +273,7 @@ void MoveGenerator::GenerateOneKnightMoves(int position) const {
         if (column < 6) {
             int move = position - 6;
             if (board->inCheck) {
-                if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) !=
-                    board->movesThatBlockCheck.end()) {
+                if (board->movesThatBlockCheckBitboard & (1ULL << move)) {
                     if (board->getPieceType(move) == NONE || board->getPieceColor(move) != color) {
                         knightMoves.push_back(new Move(position, move, board));
                     }
@@ -293,8 +287,7 @@ void MoveGenerator::GenerateOneKnightMoves(int position) const {
             int move = position - 10;
 
             if (board->inCheck) {
-                if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) !=
-                    board->movesThatBlockCheck.end()) {
+                if (board->movesThatBlockCheckBitboard & (1ULL << move)) {
                     if (board->getPieceType(move) == NONE || board->getPieceColor(move) != color) {
                         knightMoves.push_back(new Move(position, move, board));
                     }
@@ -339,7 +332,7 @@ void MoveGenerator::GenerateOneRookMoves(int position) const {
         }
 
         if (board->inCheck) {
-            if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) == board->movesThatBlockCheck.end()) {
+            if (board->movesThatBlockCheckBitboard & (1ULL << move)) {
                 continue;
             }
         }
@@ -360,7 +353,7 @@ void MoveGenerator::GenerateOneRookMoves(int position) const {
         }
 
         if (board->inCheck) {
-            if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) == board->movesThatBlockCheck.end()) {
+            if (board->movesThatBlockCheckBitboard & (1ULL << move)) {
                 continue;
             }
         }
@@ -381,7 +374,7 @@ void MoveGenerator::GenerateOneRookMoves(int position) const {
         }
 
         if (board->inCheck) {
-            if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) == board->movesThatBlockCheck.end()) {
+            if (board->movesThatBlockCheckBitboard & (1ULL << move)) {
                 continue;
             }
         }
@@ -402,7 +395,7 @@ void MoveGenerator::GenerateOneRookMoves(int position) const {
         }
 
         if (board->inCheck) {
-            if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) == board->movesThatBlockCheck.end()) {
+            if (board->movesThatBlockCheckBitboard & (1ULL << move)) {
                 continue;
             }
         }
@@ -433,10 +426,11 @@ void MoveGenerator::GenerateBishopMoves() {
     }
 }
 
-void MoveGenerator::GenerateOneBishopMoves( int position) const {
+void MoveGenerator::GenerateOneBishopMoves(int position) const {
     const int row = position / 8;
     const int column = position % 8;
 
+    ChessColor color = board->getPieceColor(position);
     std::vector<Move*> bishopMoves;
 
     // Check if bishop can move up and right
@@ -446,18 +440,20 @@ void MoveGenerator::GenerateOneBishopMoves( int position) const {
         }
         int move = position + (9 * i);
 
+        if (board->getPieceColor(move) == color) {
+            break;
+        }
+
         if (board->inCheck) {
-            if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) == board->movesThatBlockCheck.end()) {
+            if (board->movesThatBlockCheckBitboard & (1ULL << move)) {
                 continue;
             }
         }
 
         if (board->getPieceType(move) == NONE) {
             bishopMoves.push_back(new Move(position, move, board));
-        } else if (board->getPieceColor(move) != board->turn) {
-            bishopMoves.push_back(new Move(position, move, board));
-            break;
         } else {
+            bishopMoves.push_back(new Move(position, move, board));
             break;
         }
     }
@@ -467,20 +463,23 @@ void MoveGenerator::GenerateOneBishopMoves( int position) const {
         if (row + i > 7 || column - i < 0) {
             break;
         }
+
         int move = position + (7 * i);
 
+        if (board->getPieceColor(move) == color) {
+            break;
+        }
+
         if (board->inCheck) {
-            if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) == board->movesThatBlockCheck.end()) {
+            if (board->movesThatBlockCheckBitboard & (1ULL << move)) {
                 continue;
             }
         }
 
         if (board->getPieceType(move) == NONE) {
             bishopMoves.push_back(new Move(position, move, board));
-        } else if (board->getPieceColor(move) != board->turn) {
-            bishopMoves.push_back(new Move(position, move, board));
-            break;
         } else {
+            bishopMoves.push_back(new Move(position, move, board));
             break;
         }
     }
@@ -492,18 +491,20 @@ void MoveGenerator::GenerateOneBishopMoves( int position) const {
         }
         int move = position - (7 * i);
 
+        if (board->getPieceColor(move) == color) {
+            break;
+        }
+
         if (board->inCheck) {
-            if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) == board->movesThatBlockCheck.end()) {
+            if (board->movesThatBlockCheckBitboard & (1ULL << move)) {
                 continue;
             }
         }
 
         if (board->getPieceType(move) == NONE) {
             bishopMoves.push_back(new Move(position, move, board));
-        } else if (board->getPieceColor(move) != board->turn) {
-            bishopMoves.push_back(new Move(position, move, board));
-            break;
         } else {
+            bishopMoves.push_back(new Move(position, move, board));
             break;
         }
     }
@@ -515,18 +516,20 @@ void MoveGenerator::GenerateOneBishopMoves( int position) const {
         }
         int move = position - (9 * i);
 
+        if (board->getPieceColor(move) == color) {
+            break;
+        }
+
         if (board->inCheck) {
-            if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) == board->movesThatBlockCheck.end()) {
+            if (board->movesThatBlockCheckBitboard & (1ULL << move)) {
                 continue;
             }
         }
 
         if (board->getPieceType(move) == NONE) {
             bishopMoves.push_back(new Move(position, move, board));
-        } else if (board->getPieceColor(move) != board->turn) {
-            bishopMoves.push_back(new Move(position, move, board));
-            break;
         } else {
+            bishopMoves.push_back(new Move(position, move, board));
             break;
         }
     }
@@ -553,131 +556,144 @@ void MoveGenerator::GenerateOneQueenMoves( int position) const {
     const int row = position / 8;
     const int column = position % 8;
 
+    ChessColor color = board->getPieceColor(position);
     std::vector<Move*> queenMoves;
 
     // Check if queen can move up
-    for (int i = row + 1; i < 8; i++) {
-        int move = position + (8 * (i - row));
+    if (row < 7) {
+        for (int i = row + 1; i < 8; i++) {
+            int move = position + (8 * (i - row));
 
-        if (board->inCheck) {
-            if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) == board->movesThatBlockCheck.end()) {
-                continue;
+            if (board->inCheck) {
+                if (board->movesThatBlockCheckBitboard & (1ULL << move)) {
+                    continue;
+                }
             }
-        }
 
-        if (board->getPieceType(move) == NONE) {
-            queenMoves.push_back(new Move(position, move, board));
-        } else if (board->getPieceColor(move) != board->turn) {
-            queenMoves.push_back(new Move(position, move, board));
-            break;
-        } else {
-            break;
+            if (board->getPieceType(move) == NONE) {
+                queenMoves.push_back(new Move(position, move, board));
+            } else if (board->getPieceColor(move) != color) {
+                queenMoves.push_back(new Move(position, move, board));
+                break;
+            } else {
+                break;
+            }
         }
     }
 
     // Check if queen can move down
-    for (int i = row - 1; i >= 0; i--) {
-        int move = position - (8 * (row - i));
+    if (row > 0) {
+        for (int i = row - 1; i >= 0; i--) {
+            int move = position - (8 * (row - i));
 
-        if (board->inCheck) {
-            if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) == board->movesThatBlockCheck.end()) {
-                continue;
+            if (board->inCheck) {
+                if (board->movesThatBlockCheckBitboard & (1ULL << move)
+) {
+                    continue;
+                }
             }
-        }
 
-        if (board->getPieceType(move) == NONE) {
-            queenMoves.push_back(new Move(position, move, board));
-        } else if (board->getPieceColor(move) != board->turn) {
-            queenMoves.push_back(new Move(position, move, board));
-            break;
-        } else {
-            break;
+            if (board->getPieceType(move) == NONE) {
+                queenMoves.push_back(new Move(position, move, board));
+            } else if (board->getPieceColor(move) != color) {
+                queenMoves.push_back(new Move(position, move, board));
+                break;
+            } else {
+                break;
+            }
         }
     }
 
     // Check if queen can move right
-    for (int i = column + 1; i < 8; i++) {
-        int move = position + (i - column);
+    if (column < 7) {
+        for (int i = column + 1; i < 8; i++) {
+            int move = position + (i - column);
 
-        if (board->inCheck) {
-            if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) == board->movesThatBlockCheck.end()) {
-                continue;
+            if (board->inCheck) {
+                if (board->movesThatBlockCheckBitboard & (1ULL << move)) {
+                    continue;
+                }
             }
-        }
 
-        if (board->getPieceType(move) == NONE) {
-            queenMoves.push_back(new Move(position, move, board));
-        } else if (board->getPieceColor(move) != board->turn) {
-            queenMoves.push_back(new Move(position, move, board));
-            break;
-        } else {
-            break;
+            if (board->getPieceType(move) == NONE) {
+                queenMoves.push_back(new Move(position, move, board));
+            } else if (board->getPieceColor(move) != color) {
+                queenMoves.push_back(new Move(position, move, board));
+                break;
+            } else {
+                break;
+            }
         }
     }
 
     // Check if queen can move left
-    for (int i = column - 1; i >= 0; i--) {
-        int move = position - (column - i);
+    if (column > 0) {
+        for (int i = column - 1; i >= 0; i--) {
+            int move = position - (column - i);
 
-        if (board->inCheck) {
-            if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) == board->movesThatBlockCheck.end()) {
-                continue;
+            if (board->inCheck) {
+                if (board->movesThatBlockCheckBitboard & (1ULL << move)
+) {
+                    continue;
+                }
+            }
+
+            if (board->getPieceType(move) == NONE) {
+                queenMoves.push_back(new Move(position, move, board));
+            } else if (board->getPieceColor(move) != color) {
+                queenMoves.push_back(new Move(position, move, board));
+                break;
+            } else {
+                break;
             }
         }
 
-        if (board->getPieceType(move) == NONE) {
-            queenMoves.push_back(new Move(position, move, board));
-        } else if (board->getPieceColor(move) != board->turn) {
-            queenMoves.push_back(new Move(position, move, board));
-            break;
-        } else {
-            break;
-        }
-    }
+        // Check if queen can move up and right
+        for (int i = 1; i < 8; i++) {
+            if (row + i > 7 || column + i > 7) {
+                break;
+            }
+            int move = position + (9 * i);
 
-    // Check if queen can move up and right
-    for (int i = 1; i < 8; i++) {
-        if (row + i > 7 || column + i > 7) {
-            break;
-        }
-        int move = position + (9 * i);
+            if (board->inCheck) {
+                if (board->movesThatBlockCheckBitboard & (1ULL << move)
+) {
+                    continue;
+                }
+            }
 
-        if (board->inCheck) {
-            if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) == board->movesThatBlockCheck.end()) {
-                continue;
+            if (board->getPieceType(move) == NONE) {
+                queenMoves.push_back(new Move(position, move, board));
+            } else if (board->getPieceColor(move) != color) {
+                queenMoves.push_back(new Move(position, move, board));
+                break;
+            } else {
+                break;
             }
         }
 
-        if (board->getPieceType(move) == NONE) {
-            queenMoves.push_back(new Move(position, move, board));
-        } else if (board->getPieceColor(move) != board->turn) {
-            queenMoves.push_back(new Move(position, move, board));
-            break;
-        } else {
-            break;
-        }
-    }
-
-    // Check if queen can move up and left
-    for (int i = 1; i < 8; i++) {
-        if (row + i > 7 || column - i < 0) {
-            break;
-        }
-        int move = position + (7 * i);
-
-        if (board->inCheck) {
-            if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) == board->movesThatBlockCheck.end()) {
-                continue;
+        // Check if queen can move up and left
+        for (int i = 1; i < 8; i++) {
+            if (row + i > 7 || column - i < 0) {
+                break;
             }
-        }
+            int move = position + (7 * i);
 
-        if (board->getPieceType(move) == NONE) {
-            queenMoves.push_back(new Move(position, move, board));
-        } else if (board->getPieceColor(move) != board->turn) {
-            queenMoves.push_back(new Move(position, move, board));
-            break;
-        } else {
-            break;
+            if (board->inCheck) {
+                if (board->movesThatBlockCheckBitboard & (1ULL << move)
+) {
+                    continue;
+                }
+            }
+
+            if (board->getPieceType(move) == NONE) {
+                queenMoves.push_back(new Move(position, move, board));
+            } else if (board->getPieceColor(move) != color) {
+                queenMoves.push_back(new Move(position, move, board));
+                break;
+            } else {
+                break;
+            }
         }
     }
 
@@ -689,14 +705,14 @@ void MoveGenerator::GenerateOneQueenMoves( int position) const {
         int move = position - (7 * i);
 
         if (board->inCheck) {
-            if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) == board->movesThatBlockCheck.end()) {
+            if (board->movesThatBlockCheckBitboard & (1ULL << move)) {
                 continue;
             }
         }
 
         if (board->getPieceType(move) == NONE) {
             queenMoves.push_back(new Move(position, move, board));
-        } else if (board->getPieceColor(move) != board->turn) {
+        } else if (board->getPieceColor(move) != color) {
             queenMoves.push_back(new Move(position, move, board));
             break;
         } else {
@@ -712,14 +728,14 @@ void MoveGenerator::GenerateOneQueenMoves( int position) const {
         int move = position - (9 * i);
 
         if (board->inCheck) {
-            if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) == board->movesThatBlockCheck.end()) {
+            if (board->movesThatBlockCheckBitboard & (1ULL << move)) {
                 continue;
             }
         }
 
         if (board->getPieceType(move) == NONE) {
             queenMoves.push_back(new Move(position, move, board));
-        } else if (board->getPieceColor(move) != board->turn) {
+        } else if (board->getPieceColor(move) != color) {
             queenMoves.push_back(new Move(position, move, board));
             break;
         } else {
@@ -749,7 +765,7 @@ void MoveGenerator::GenerateOneKingMoves( int position) const {
     // Check if king can move 1 row up
     if (row < 7) {
         int move = position + 8;
-        if (board->getPieceType(move) == NONE || board->getPieceColor(move) != board->turn) {
+        if ((board->getPieceType(move) == NONE || board->getPieceColor(move) != board->turn) && (board->controlledSquaresBitboard & (1ULL << move)) == 0) {
             kingMoves.push_back(new Move(position, move, board));
 
         }
@@ -757,49 +773,49 @@ void MoveGenerator::GenerateOneKingMoves( int position) const {
     // Check if king can move 1 row down
     if (row > 0) {
         int move = position - 8;
-        if (board->getPieceType(move) == NONE || board->getPieceColor(move) != board->turn) {
+        if ((board->getPieceType(move) == NONE || board->getPieceColor(move) != board->turn) && (board->controlledSquaresBitboard & (1ULL << move)) == 0) {
             kingMoves.push_back(new Move(position, move, board));
         }
     }
     // Check if king can move 1 column right
     if (column < 7) {
         int move = position + 1;
-        if (board->getPieceType(move) == NONE || board->getPieceColor(move) != board->turn) {
+        if ((board->getPieceType(move) == NONE || board->getPieceColor(move) != board->turn) && (board->controlledSquaresBitboard & (1ULL << move)) == 0) {
             kingMoves.push_back(new Move(position, move, board));
         }
     }
     // Check if king can move 1 column left
     if (column > 0) {
         int move = position - 1;
-        if (board->getPieceType(move) == NONE || board->getPieceColor(move) != board->turn) {
+        if ((board->getPieceType(move) == NONE || board->getPieceColor(move) != board->turn) && (board->controlledSquaresBitboard & (1ULL << move)) == 0) {
             kingMoves.push_back(new Move(position, move, board));
         }
     }
     // Check if king can move 1 row up and 1 column right
     if (row < 7 && column < 7) {
         int move = position + 9;
-        if (board->getPieceType(move) == NONE || board->getPieceColor(move) != board->turn) {
+        if ((board->getPieceType(move) == NONE || board->getPieceColor(move) != board->turn) && (board->controlledSquaresBitboard & (1ULL << move)) == 0) {
             kingMoves.push_back(new Move(position, move, board));
         }
     }
     // Check if king can move 1 row up and 1 column left
     if (row < 7 && column > 0) {
         int move = position + 7;
-        if (board->getPieceType(move) == NONE || board->getPieceColor(move) != board->turn) {
+        if ((board->getPieceType(move) == NONE || board->getPieceColor(move) != board->turn) && (board->controlledSquaresBitboard & (1ULL << move)) == 0) {
             kingMoves.push_back(new Move(position, move, board));
         }
     }
     // Check if king can move 1 row down and 1 column right
     if (row > 0 && column < 7) {
         int move = position - 7;
-        if (board->getPieceType(move) == NONE || board->getPieceColor(move) != board->turn) {
+        if ((board->getPieceType(move) == NONE || board->getPieceColor(move) != board->turn) && (board->controlledSquaresBitboard & (1ULL << move)) == 0) {
             kingMoves.push_back(new Move(position, move, board));
         }
     }
     // Check if king can move 1 row down and 1 column left
     if (row > 0 && column > 0) {
         int move = position - 9;
-        if (board->getPieceType(move) == NONE || board->getPieceColor(move) != board->turn) {
+        if ((board->getPieceType(move) == NONE || board->getPieceColor(move) != board->turn) && (board->controlledSquaresBitboard & (1ULL << move)) == 0) {
             kingMoves.push_back(new Move(position, move, board));
         }
     }
@@ -810,14 +826,14 @@ void MoveGenerator::GenerateOneKingMoves( int position) const {
             // check if there is a rook on the king side
             if (board->getPieceType(63) == PieceType::ROOK && board->getPieceColor(63) == ChessColor::COLORWHITE) {
                 // check if there are no pieces between the king and the rook
-                if (board->getPieceType(61) == NONE && board->getPieceType(61) == NONE && std::find(board->controlledSquares.begin(), board->controlledSquares.end(), 61) == board->controlledSquares.end() && std::find(board->controlledSquares.begin(), board->controlledSquares.end(), 62) == board->controlledSquares.end()) {
+                if (board->getPieceType(61) == NONE && board->getPieceType(61) == NONE && (board->controlledSquaresBitboard & (1ULL << 61)) == 0 && (board->controlledSquaresBitboard & (1ULL << 62)) == 0) {
                     kingMoves.push_back(new Move(position, 62, board));
                 }
             }
             // check if there is a rook on the queen side
             if (board->getPieceType(56) == PieceType::ROOK && board->getPieceColor(56) == ChessColor::COLORWHITE) {
                 // check if there are no pieces between the king and the rook
-                if (board->getPieceType(58) == NONE && board->getPieceType(59) == NONE && std::find(board->controlledSquares.begin(), board->controlledSquares.end(), 57) == board->controlledSquares.end() && std::find(board->controlledSquares.begin(), board->controlledSquares.end(), 58) == board->controlledSquares.end() && std::find(board->controlledSquares.begin(), board->controlledSquares.end(), 59) == board->controlledSquares.end()) {
+                if (board->getPieceType(58) == NONE && board->getPieceType(59) == NONE && (board->controlledSquaresBitboard & (1ULL << 58)) == 0 && (board->controlledSquaresBitboard & (1ULL << 59)) == 0) {
                     kingMoves.push_back(new Move(position, 58, board));
                 }
             }
@@ -826,33 +842,25 @@ void MoveGenerator::GenerateOneKingMoves( int position) const {
             // check if there is a rook on the king side
             if (board->getPieceType(7) == PieceType::ROOK && board->getPieceColor(7) == ChessColor::COLORBLACK) {
                 // check if there are no pieces between the king and the rook
-                if (board->getPieceType(5) == NONE && board->getPieceType(6) == NONE && std::find(board->controlledSquares.begin(), board->controlledSquares.end(), 5) == board->controlledSquares.end() && std::find(board->controlledSquares.begin(), board->controlledSquares.end(), 6) == board->controlledSquares.end()) {
+                if (board->getPieceType(5) == NONE && board->getPieceType(6) == NONE && (board->controlledSquaresBitboard & (1ULL << 5)) == 0 && (board->controlledSquaresBitboard & (1ULL << 6)) == 0) {
                     kingMoves.push_back(new Move(position, 6, board));
                 }
             }
             // check if there is a rook on the queen side
             if (board->getPieceType(0) == PieceType::ROOK && board->getPieceColor(0) == ChessColor::COLORBLACK) {
                 // check if there are no pieces between the king and the rook
-                if (board->getPieceType(1) == NONE && board->getPieceType(2) == NONE && board->getPieceType(3) == NONE && std::find(board->controlledSquares.begin(), board->controlledSquares.end(), 1) == board->controlledSquares.end() && std::find(board->controlledSquares.begin(), board->controlledSquares.end(), 2) == board->controlledSquares.end() && std::find(board->controlledSquares.begin(), board->controlledSquares.end(), 3) == board->controlledSquares.end()) {
+                if (board->getPieceType(1) == NONE && board->getPieceType(2) == NONE && board->getPieceType(3) == NONE && (board->controlledSquaresBitboard & (1ULL << 1)) == 0 && board->controlledSquaresBitboard & (1ULL << 2) == 0 && board->controlledSquaresBitboard & (1ULL << 3) == 0) {
                     kingMoves.push_back(new Move(position, 2, board));
                 }
             }
         }
     }
-
-    std::vector<Move*> validMoves;
-    for (auto move : kingMoves) {
-        if (std::find(board->controlledSquares.begin(), board->controlledSquares.end(), move->toSquare) == board->controlledSquares.end()) {
-            validMoves.push_back(move);
-        }
-    }
-    kingMoves = validMoves;
-
+    
     board->moveMap.emplace(position, kingMoves);
 }
 
-std::vector<int> MoveGenerator::GeneratePawnCaptures() const {
-    std::vector<int> pawnCaptures;
+uint64_t MoveGenerator::GeneratePawnCaptures() const {
+    uint64_t pawnCaptures = 0ULL;
 
     uint64_t pawnsBitboard = board->pawnsBitboard;
     // Loop through the Pawns bitboard
@@ -867,17 +875,17 @@ std::vector<int> MoveGenerator::GeneratePawnCaptures() const {
         const int column = position % 8;
         if (board->turn == ChessColor::COLORWHITE) {
             if (column > 0) {
-                pawnCaptures.push_back(position - 7);
+                pawnCaptures |= (1ULL << (position - 7));
             }
             if (column < 7) {
-                pawnCaptures.push_back(position - 9);
+                pawnCaptures |= (1ULL << (position - 9));
             }
         } else {
             if (column > 0) {
-                pawnCaptures.push_back(position + 9);
+                pawnCaptures |= (1ULL << (position + 9));
             }
             if (column < 7) {
-                pawnCaptures.push_back(position + 7);
+                pawnCaptures |= (1ULL << (position + 7));
             }
         }
         pawnsBitboard &= pawnsBitboard - 1ULL;
@@ -885,8 +893,8 @@ std::vector<int> MoveGenerator::GeneratePawnCaptures() const {
     return pawnCaptures;
 }
 
-std::vector<int> MoveGenerator::GenerateKnightCaptures() const {
-    std::vector<int> knightCaptures;
+uint64_t MoveGenerator::GenerateKnightCaptures() const {
+    uint64_t knightCaptures = 0ULL;
 
     uint64_t knightsBitboard = board->knightsBitboard;
 
@@ -903,50 +911,50 @@ std::vector<int> MoveGenerator::GenerateKnightCaptures() const {
         // Check if knight can move 2 rows up and 1 column right
         if (row < 6 && column < 7) {
             int move = position + 17;
-            knightCaptures.push_back(move);
+            knightCaptures |= (1ULL << move);
         }
         // Check if knight can move 2 rows up and 1 column left
         if (row < 6 && column > 0) {
             int move = position + 15;
-            knightCaptures.push_back(move);
+            knightCaptures |= (1ULL << move);
         }
         // Check if knight can move 2 rows down and 1 column right
         if (row > 1 && column < 7) {
             int move = position - 15;
-            knightCaptures.push_back(move);
+            knightCaptures |= (1ULL << move);
         }
         // Check if knight can move 2 rows down and 1 column left
         if (row > 1 && column > 0) {
             int move = position - 17;
-            knightCaptures.push_back(move);
+            knightCaptures |= (1ULL << move);
         }
         // Check if knight can move 1 row up and 2 columns right
         if (row < 7 && column < 6) {
             int move = position + 10;
-            knightCaptures.push_back(move);
+            knightCaptures |= (1ULL << move);
         }
         // Check if knight can move 1 row up and 2 columns left
         if (row < 7 && column > 1) {
             int move = position + 6;
-            knightCaptures.push_back(move);
+            knightCaptures |= (1ULL << move);
         }
         // Check if knight can move 1 row down and 2 columns right
         if (row > 0 && column < 6) {
             int move = position - 6;
-            knightCaptures.push_back(move);
+            knightCaptures |= (1ULL << move);
         }
         // Check if knight can move 1 row down and 2 columns left
         if (row > 0 && column > 1) {
             int move = position - 10;
-            knightCaptures.push_back(move);
+            knightCaptures |= (1ULL << move);
         }
         knightsBitboard &= knightsBitboard - 1ULL;
     }
     return knightCaptures;
 }
 
-std::vector<int> MoveGenerator::GenerateBishopCaptures() const {
-    std::vector<int> bishopCaptures;
+uint64_t MoveGenerator::GenerateBishopCaptures() const {
+    uint64_t bishopCaptures = 0ULL;
 
     uint64_t bishopsBitboard = board->bishopsBitboard;
 
@@ -967,9 +975,9 @@ std::vector<int> MoveGenerator::GenerateBishopCaptures() const {
             int move = position + (9 * i);
 
             if (board->getPieceType(move) == NONE) {
-                bishopCaptures.push_back(move);
+                bishopCaptures |= (1ULL << move);
             } else {
-                bishopCaptures.push_back(move);
+                bishopCaptures |= (1ULL << move);
                 break;
             }
         }
@@ -982,15 +990,15 @@ std::vector<int> MoveGenerator::GenerateBishopCaptures() const {
             int move = position + (7 * i);
 
             if (board->inCheck) {
-                if (std::find(board->movesThatBlockCheck.begin(), board->movesThatBlockCheck.end(), move) == board->movesThatBlockCheck.end()) {
+                if (board->movesThatBlockCheckBitboard & (1ULL << move)) {
                     continue;
                 }
             }
 
             if (board->getPieceType(move) == NONE) {
-                bishopCaptures.push_back(move);
+                bishopCaptures |= (1ULL << move);
             } else {
-                bishopCaptures.push_back(move);
+                bishopCaptures |= (1ULL << move);
                 break;
             }
         }
@@ -1003,9 +1011,9 @@ std::vector<int> MoveGenerator::GenerateBishopCaptures() const {
             int move = position - (7 * i);
 
             if (board->getPieceType(move) == NONE) {
-                bishopCaptures.push_back(move);
+                bishopCaptures |= (1ULL << move);
             } else {
-                bishopCaptures.push_back(move);
+                bishopCaptures |= (1ULL << move);
                 break;
             }
         }
@@ -1018,9 +1026,9 @@ std::vector<int> MoveGenerator::GenerateBishopCaptures() const {
             int move = position - (9 * i);
 
             if (board->getPieceType(move) == NONE) {
-                bishopCaptures.push_back(move);
+                bishopCaptures |= (1ULL << move);
             } else {
-                bishopCaptures.push_back(move);
+                bishopCaptures |= (1ULL << move);
                 break;
             }
         }
@@ -1030,8 +1038,8 @@ std::vector<int> MoveGenerator::GenerateBishopCaptures() const {
     return bishopCaptures;
 }
 
-std::vector<int> MoveGenerator::GenerateRookCaptures() const {
-    std::vector<int> rookCaptures;
+uint64_t MoveGenerator::GenerateRookCaptures() const {
+    uint64_t rookCaptures = 0ULL;
 
     uint64_t rooksBitboard = board->rooksBitboard;
 
@@ -1049,9 +1057,9 @@ std::vector<int> MoveGenerator::GenerateRookCaptures() const {
             int move = position + (8 * (i - row));
 
             if (board->getPieceType(move) == NONE) {
-                rookCaptures.push_back(move);
+                rookCaptures |= (1ULL << move);
             } else  {
-                rookCaptures.push_back(move);
+                rookCaptures |= (1ULL << move);
                 break;
             }
         }
@@ -1060,9 +1068,9 @@ std::vector<int> MoveGenerator::GenerateRookCaptures() const {
             int move = position - (8 * (row - i));
 
             if (board->getPieceType(move) == NONE) {
-                rookCaptures.push_back(move);
+                rookCaptures |= (1ULL << move);
             } else {
-                rookCaptures.push_back(move);
+                rookCaptures |= (1ULL << move);
                 break;
             }
         }
@@ -1071,9 +1079,9 @@ std::vector<int> MoveGenerator::GenerateRookCaptures() const {
             int move = position + (i - column);
 
             if (board->getPieceType(move) == NONE) {
-                rookCaptures.push_back(move);
+                rookCaptures |= (1ULL << move);
             } else {
-                rookCaptures.push_back(move);
+                rookCaptures |= (1ULL << move);
                 break;
             }
         }
@@ -1082,9 +1090,9 @@ std::vector<int> MoveGenerator::GenerateRookCaptures() const {
             int move = position - (column - i);
 
             if (board->getPieceType(move) == NONE) {
-                rookCaptures.push_back(move);
+                rookCaptures |= (1ULL << move);
             } else if (board->getPieceColor(move) != board->turn) {
-                rookCaptures.push_back(move);
+                rookCaptures |= (1ULL << move);
                 break;
             }
         }
@@ -1094,8 +1102,8 @@ std::vector<int> MoveGenerator::GenerateRookCaptures() const {
     return rookCaptures;
 }
 
-std::vector<int> MoveGenerator::GenerateQueenCaptures() const {
-    std::vector<int> queenCaptures;
+uint64_t MoveGenerator::GenerateQueenCaptures() const {
+    uint64_t queenCaptures = 0ULL;
 
     uint64_t queensBitboard = board->queensBitboard;
 
@@ -1112,7 +1120,7 @@ std::vector<int> MoveGenerator::GenerateQueenCaptures() const {
         // Check if queen can move up
         for (int i = row + 1; i < 8; i++) {
             int move = position + (8 * (i - row));
-            queenCaptures.push_back(move);
+            queenCaptures |= (1ULL << move);
             // If there is a piece on the square, stop checking this direction
             if (board->getPieceType(move) != NONE) {
                 break;
@@ -1122,7 +1130,7 @@ std::vector<int> MoveGenerator::GenerateQueenCaptures() const {
         // Check if queen can move down
         for (int i = row - 1; i >= 0; i--) {
             int move = position - (8 * (row - i));
-            queenCaptures.push_back(move);
+            queenCaptures |= (1ULL << move);
             // If there is a piece on the square, stop checking this direction
             if (board->getPieceType(move) != NONE) {
                 break;
@@ -1132,7 +1140,7 @@ std::vector<int> MoveGenerator::GenerateQueenCaptures() const {
         // Check if queen can move right
         for (int i = column + 1; i < 8; i++) {
             int move = position + (i - column);
-            queenCaptures.push_back(move);
+            queenCaptures |= (1ULL << move);
             // If there is a piece on the square, stop checking this direction
             if (board->getPieceType(move) != NONE) {
                 break;
@@ -1142,7 +1150,7 @@ std::vector<int> MoveGenerator::GenerateQueenCaptures() const {
         // Check if queen can move left
         for (int i = column - 1; i >= 0; i--) {
             int move = position - (column - i);
-            queenCaptures.push_back(move);
+            queenCaptures |= (1ULL << move);
             // If there is a piece on the square, stop checking this direction
             if (board->getPieceType(move) != NONE) {
                 break;
@@ -1155,7 +1163,7 @@ std::vector<int> MoveGenerator::GenerateQueenCaptures() const {
                 break;
             }
             int move = position + (9 * i);
-            queenCaptures.push_back(move);
+            queenCaptures |= (1ULL << move);
             // If there is a piece on the square, stop checking this direction
             if (board->getPieceType(move) != NONE) {
                 break;
@@ -1168,7 +1176,7 @@ std::vector<int> MoveGenerator::GenerateQueenCaptures() const {
                 break;
             }
             int move = position + (7 * i);
-            queenCaptures.push_back(move);
+            queenCaptures |= (1ULL << move);
             // If there is a piece on the square, stop checking this direction
             if (board->getPieceType(move) != NONE) {
                 break;
@@ -1181,7 +1189,7 @@ std::vector<int> MoveGenerator::GenerateQueenCaptures() const {
                 break;
             }
             int move = position - (7 * i);
-            queenCaptures.push_back(move);
+            queenCaptures |= (1ULL << move);
             // If there is a piece on the square, stop checking this direction
             if (board->getPieceType(move) != NONE) {
                 break;
@@ -1194,7 +1202,7 @@ std::vector<int> MoveGenerator::GenerateQueenCaptures() const {
                 break;
             }
             int move = position - (9 * i);
-            queenCaptures.push_back(move);
+            queenCaptures |= (1ULL << move);
             // If there is a piece on the square, stop checking this direction
             if (board->getPieceType(move) != NONE) {
             break;
@@ -1205,8 +1213,8 @@ std::vector<int> MoveGenerator::GenerateQueenCaptures() const {
     return queenCaptures;
 }
 
-std::vector<int> MoveGenerator::GenerateKingCaptures() const {
-    std::vector<int> kingCaptures;
+uint64_t MoveGenerator::GenerateKingCaptures() const {
+    uint64_t kingCaptures;
 
     uint64_t kingsBitboard = board->kingsBitboard;
 
@@ -1221,42 +1229,42 @@ std::vector<int> MoveGenerator::GenerateKingCaptures() const {
         // Check if king can move 1 row up
         if (row < 7) {
             int move = position + 8;
-            kingCaptures.push_back(move);
+            kingCaptures |= (1ULL << move);
         }
         // Check if king can move 1 row down
         if (row > 0) {
             int move = position - 8;
-            kingCaptures.push_back(move);
+            kingCaptures |= (1ULL << move);
         }
         // Check if king can move 1 column right
         if (column < 7) {
             int move = position + 1;
-            kingCaptures.push_back(move);
+            kingCaptures |= (1ULL << move);
         }
         // Check if king can move 1 column left
         if (column > 0) {
             int move = position - 1;
-            kingCaptures.push_back(move);
+            kingCaptures |= (1ULL << move);
         }
         // Check if king can move 1 row up and 1 column right
         if (row < 7 && column < 7) {
             int move = position + 9;
-            kingCaptures.push_back(move);
+            kingCaptures |= (1ULL << move);
         }
         // Check if king can move 1 row up and 1 column left
         if (row < 7 && column > 0) {
             int move = position + 7;
-            kingCaptures.push_back(move);
+            kingCaptures |= (1ULL << move);
         }
         // Check if king can move 1 row down and 1 column right
         if (row > 0 && column < 7) {
             int move = position - 7;
-            kingCaptures.push_back(move);
+            kingCaptures |= (1ULL << move);
         }
         // Check if king can move 1 row down and 1 column left
         if (row > 0 && column > 0) {
             int move = position - 9;
-            kingCaptures.push_back(move);
+            kingCaptures |= (1ULL << move);
         }
         kingsBitboard &= kingsBitboard - 1ULL;
     }

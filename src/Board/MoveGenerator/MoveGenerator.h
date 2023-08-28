@@ -40,12 +40,12 @@ private:
     void GenerateOneQueenMoves(int position) const;
     void GenerateOneKingMoves(int position) const;
 
-    std::vector<int> GeneratePawnCaptures() const;
-    std::vector<int> GenerateKnightCaptures() const;
-    std::vector<int> GenerateBishopCaptures() const;
-    std::vector<int> GenerateRookCaptures() const;
-    std::vector<int> GenerateQueenCaptures() const;
-    std::vector<int> GenerateKingCaptures() const;
+    uint64_t GeneratePawnCaptures() const;
+    uint64_t GenerateKnightCaptures() const;
+    uint64_t GenerateBishopCaptures() const;
+    uint64_t GenerateRookCaptures() const;
+    uint64_t GenerateQueenCaptures() const;
+    uint64_t GenerateKingCaptures() const;
 };
 
 #endif //CHESSGAME_MOVEGENERATOR_H

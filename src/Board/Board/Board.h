@@ -7,7 +7,6 @@
 #include "../GameLoop/GameLoop.h"
 #include "../Types/Types.h"
 #include "../Move/Move.h"
-#include <map>
 #include <cstdint>
 #include <unordered_map>
 
@@ -23,10 +22,9 @@ public:
 
     GameLoop* gameLoopClass;
 
-    std::vector<int> controlledSquares;
-    std::vector<Piece*> boardL;
-    std::vector<int> pinnedPieces;
-    std::vector<int> movesThatBlockCheck;
+    uint64_t controlledSquaresBitboard = 0ULL;
+    uint64_t pinnedPieces = 0ULL;
+    uint64_t movesThatBlockCheckBitboard = 0ULL;
 
     uint64_t whitePiecesBitboard = 0ULL;
     uint64_t blackPiecesBitboard = 0ULL;

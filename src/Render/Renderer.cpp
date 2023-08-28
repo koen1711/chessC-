@@ -28,10 +28,13 @@ void Renderer::drawBoard() {
     }
 
     // draw all the moves that block check
-    for (auto piece : viewBoard->board->pinnedPieces) {
+    uint64_t checkBlockers = viewBoard->board->controlledSquaresBitboard;
+    while (checkBlockers) {
+        const int piece = __builtin_ctzll(checkBlockers);
         int x = piece % 8;
         int y = piece / 8;
         DrawRectangle(x * 100, y * 100, 100, 100, BLUE);
+        checkBlockers &= checkBlockers - 1ULL;
     }
 
     for (const auto& entry : viewBoard->potentialMoves) {

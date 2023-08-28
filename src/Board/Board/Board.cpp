@@ -128,14 +128,14 @@ void Board::makeMove(Move* move) {
         // check if there are pawns and if so set the en passant flag
         if (getPieceType(leftPawnPos) == PieceType::PAWN && getPieceColor(leftPawnPos) != move->movedColor) {
             // check if we are in the right column
-            if (leftPawnPos % 8 != 7) {
+            if ((leftPawnPos % 8 != 7 && move->movedColor == ChessColor::COLORWHITE) || (leftPawnPos % 8 != 0 && move->movedColor == ChessColor::COLORBLACK)) {
                 // Get if relative for the other pawn if it is left or right
                 enPassantLeftBitboard |= (1ULL << leftPawnPos);
             }
         }
         if (getPieceType(rightPawnPos)  == PieceType::PAWN && getPieceColor(rightPawnPos) != move->movedColor) {
             // Get if relative for the other pawn if it is left or right
-            if (rightPawnPos % 8 != 0) {
+            if ((rightPawnPos % 8 != 7 && move->movedColor == ChessColor::COLORWHITE) || (rightPawnPos % 8 != 0 && move->movedColor == ChessColor::COLORBLACK)) {
                 enPassantRightBitboard |= (1ULL << rightPawnPos);
             }
         }
@@ -153,7 +153,7 @@ void Board::makeMove(Move* move) {
     //board[from] = nullptr;
     //pieceToMove->moves.clear();
     moveGenerator->GenerateCapturesOnly();
-    turn = (move->movedColor == ChessColor::COLORWHITE) ? ChessColor::COLORBLACK : ChessColor::COLORWHITE;
+    turn = move->movedColor == ChessColor::COLORWHITE ? ChessColor::COLORBLACK : ChessColor::COLORWHITE;
     moveMap.clear();
 }
 
@@ -163,7 +163,7 @@ void Board::undoMove(Move* move) {
 
     movePiece(to, from);
 
-    // Move the piece back to its original position
+    // Move the captured piece back to its original position
     if (move->capturedPiece != NONE) {
         // Restore the captured piece if there was any
         switch (move->capturedPiece) {
@@ -221,18 +221,20 @@ void Board::undoMove(Move* move) {
 
     // Handle en passant
     if (move->isEnPassant) {
-        int capturedPawnPos;
+        int capturedPawnPos = -1;
         if (move->movedColor == ChessColor::COLORWHITE) {
             capturedPawnPos = to + 8;
-        } else {
+        } else if (move->movedColor == ChessColor::COLORBLACK) {
             capturedPawnPos = to - 8;
         }
-        // Restore the captured pawn
-        pawnsBitboard |= (1ULL << capturedPawnPos);
-        if (move->movedColor == ChessColor::COLORBLACK) {
-            whitePiecesBitboard |= (1ULL << capturedPawnPos);
-        } else {
-            blackPiecesBitboard |= (1ULL << capturedPawnPos);
+        if (capturedPawnPos != -1) {
+            // Restore the captured pawn
+            pawnsBitboard |= (1ULL << capturedPawnPos);
+            if (move->movedColor == ChessColor::COLORBLACK) {
+                whitePiecesBitboard |= (1ULL << capturedPawnPos);
+            } else {
+                blackPiecesBitboard |= (1ULL << capturedPawnPos);
+            }
         }
     }
 
@@ -241,12 +243,12 @@ void Board::undoMove(Move* move) {
         int leftPawnPos = to + 1;
         int rightPawnPos = to - 1;
         if (getPieceType(rightPawnPos) == PieceType::PAWN && getPieceColor(rightPawnPos) != move->movedColor) {
-            if (leftPawnPos % 8 != 7) {
+            if ((leftPawnPos % 8 != 7 && move->movedColor == ChessColor::COLORWHITE) || (leftPawnPos % 8 != 0 && move->movedColor == ChessColor::COLORBLACK)) {
                 enPassantLeftBitboard &= ~(1ULL << leftPawnPos);
             }
         }
         if (getPieceType(rightPawnPos) == PieceType::PAWN && getPieceColor(rightPawnPos) != move->movedColor) {
-            if (rightPawnPos % 8 != 0) {
+            if ((rightPawnPos % 8 != 7 && move->movedColor == ChessColor::COLORWHITE) || (rightPawnPos % 8 != 0 && move->movedColor == ChessColor::COLORBLACK)) {
                 enPassantLeftBitboard &= ~(1ULL << rightPawnPos);
             }
         }
@@ -261,6 +263,7 @@ void Board::undoMove(Move* move) {
     }
 
 
+    moveMap.clear();
     moveGenerator->GenerateCapturesOnly();
     // Update the turn
     turn = move->movedColor;

@@ -6,6 +6,7 @@
 #include "../Board/Board.h"
 #include <map>
 #include "../Types/Types.h"
+#include <cstdint>
 
 class Board;
 
@@ -14,7 +15,7 @@ class Piece;
 class GameLoop {
     private:
         Board* board;
-        std::vector<int> attackingPieces;
+        uint64_t attackingPieces;
         std::map<int, Directions> pinnedPieces;
 
         void checkForCheck();
@@ -29,7 +30,7 @@ class GameLoop {
 
         void gameLoop();
 
-    static std::vector<int> getPositionsBetween(int startPos, int endPos);
+    static uint64_t getPositionsBetween(int startPos, int endPos);
 };
 
 

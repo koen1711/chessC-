@@ -21,10 +21,9 @@ void ViewBoard::init()
 void ViewBoard::movePiece(Move *move) {
     // move the piece
     board->makeMove(move);
-    board->gameLoop();
-    // update the drawing board
-    // update the turn
     turn = turn == ChessColor::COLORWHITE ? ChessColor::COLORBLACK : ChessColor::COLORWHITE;
+    board->gameLoop();
+
 }
 
 
@@ -41,7 +40,7 @@ void ViewBoard::handleClick(Vector2 mousePosition) {
         if (std::find_if(potentialMoves.begin(), potentialMoves.end(), [position](Move* move) { return move->toSquare == position; }) != potentialMoves.end()) {
             // move the piece
             Move* move = new Move(activePiece, position, board);
-            this->movePiece(move);
+            movePiece(move);
             potentialMoves.clear();
             activePiece = -1;
         }

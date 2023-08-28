@@ -47,7 +47,7 @@ int main(int argc, char** argv)
     auto* renderer = new Renderer(board);
 
     Vector2 mousePosition = {0, 0};
-    for (int i = 1; i < 4; i++) {
+    for (int i = 1; i < 5; i++) {
         // Start the timer
         auto start = std::chrono::high_resolution_clock::now();
         MoveGenerationTest(i, board->board, renderer);
