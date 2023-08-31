@@ -33,6 +33,7 @@ enum PieceValue {
 };
 
 enum Directions {
+    NODIRECTION = -1,
     VERTICALUP = 0,
     VERTICALDOWN = 1,
     HORIZONTALLEFT = 2,
@@ -41,6 +42,7 @@ enum Directions {
     DIAGONALUPRIGHT = 5,
     DIAGONALDOWNLEFT = 6,
     DIAGONALDOWNRIGHT = 7,
+    NUMDIRECTIONS = 8
 };
 
 struct PieceSquareTable {

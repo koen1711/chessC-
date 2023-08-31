@@ -4,7 +4,7 @@
 #include "../ViewBoard.h"
 #include "../Pieces/Pieces.h"
 #include "../Board/Board.h"
-#include <map>
+#include <unordered_map>
 #include "../Types/Types.h"
 #include <cstdint>
 
@@ -16,7 +16,7 @@ class GameLoop {
     private:
         Board* board;
         uint64_t attackingPieces;
-        std::map<int, Directions> pinnedPieces;
+        std::unordered_map<int, Directions> pinnedPieces;
 
         void checkForCheck();
         void getPinnedPieces();

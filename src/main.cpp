@@ -4,6 +4,7 @@
 #include <chrono>
 #include "Board/ViewBoard.h"
 #include "Render/Renderer.h"
+#include <array>
 
 int moveCount = 0;
 
@@ -13,9 +14,9 @@ void MoveGenerationTest(int depth, Board* board, Renderer* renderer)
         return;
     }
 
-    std::unordered_map<int, std::vector<Move*>> moveMap = board->moveMap;
-    for (const auto& pair : moveMap) {
-        auto moves = pair.second;
+    std::unordered_map<int, std::vector<Move*>> moveVector = board->moveMap;
+    for (auto pair : moveVector) {
+        std::vector<Move*> moves = pair.second;
         if (depth == 1) {
             moveCount += moves.size();
         }

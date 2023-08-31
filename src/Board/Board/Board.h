@@ -23,7 +23,6 @@ public:
     GameLoop* gameLoopClass;
 
     uint64_t controlledSquaresBitboard = 0ULL;
-    uint64_t pinnedPieces = 0ULL;
     uint64_t movesThatBlockCheckBitboard = 0ULL;
 
     uint64_t whitePiecesBitboard = 0ULL;
@@ -31,6 +30,9 @@ public:
 
     uint64_t enPassantLeftBitboard = 0ULL;
     uint64_t enPassantRightBitboard = 0ULL;
+
+    uint64_t pinnedPiecesBitboard = 0ULL;
+    uint64_t pinDirectionBitboards[Directions::NUMDIRECTIONS] = {0};
 
     uint64_t pawnsBitboard = 0ULL;
     uint64_t knightsBitboard = 0ULL;
@@ -62,8 +64,9 @@ public:
 
     void undoMove(Move* move);
 
-    PieceType getPieceType(int position);
-    ChessColor getPieceColor(int position);
+    PieceType getPieceType(int position) const;
+    ChessColor getPieceColor(int position) const;
+    Directions getPinDirection(int position);
 
     void movePiece(int from, int to);
 };
