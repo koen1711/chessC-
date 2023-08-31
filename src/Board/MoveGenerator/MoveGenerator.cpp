@@ -25,7 +25,7 @@ void MoveGenerator::GenerateMoves() {
 
 void MoveGenerator::GeneratePawnMoves() {
     const bool blackTurn = board->turn == ChessColor::COLORBLACK;
-    const int promotionRow = blackTurn ? 7 : 0;
+    //const int promotionRow = blackTurn ? 7 : 0;
     const int direction = blackTurn ? 1 : -1;
     const int startingRow = blackTurn ? 1 : 6;
     const int enPassantRight = blackTurn ? 9 : 7;
@@ -565,7 +565,7 @@ void MoveGenerator::GenerateOneQueenMoves( int position) const {
     ChessColor color = board->getPieceColor(position);
     Directions pinDirection = board->getPinDirection(position);
     std::vector<Move*> queenMoves = {};
-    queenMoves.reserve(64);
+    queenMoves.reserve(28);
 
     // Check if queen can move up
     if (row < 7 && (pinDirection == Directions::NODIRECTION || (pinDirection == Directions::VERTICALUP || pinDirection == Directions::VERTICALDOWN))) {

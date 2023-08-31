@@ -9,6 +9,7 @@ GameLoop::~GameLoop() = default;
 
 void GameLoop::gameLoop() {
     board->inCheck = false;
+    board->checkmate = false;
     board->movesThatBlockCheckBitboard = 0ULL;
     board->amountOfChecks = 0;
     board->knightChecked = false;
@@ -208,8 +209,8 @@ void GameLoop::checkForCheck() {
     }
 
     // Vertical
-    if (kingRow != 0) {
-        for (int i = king; i < 64; i += 8) {
+    if (kingRow < 7) {
+        for (int i = king + 8; i < 64; i += 8) {
             if (board->getPieceType(i) != NONE) {
                 if (board->getPieceColor(i) == kingColor && i != king) {
                     pinnedPieces.emplace(i, Directions::VERTICALUP);
@@ -223,10 +224,10 @@ void GameLoop::checkForCheck() {
         }
     }
 
-    if (kingRow != 7) {
-        for (int i = king; i >= 0; i -= 8) {
+    if (kingRow > 0) {
+        for (int i = king - 8; i >= 0; i -= 8) {
             if (board->getPieceType(i) != NONE) {
-                if (board->getPieceColor(i) == kingColor && i != king) {
+                if (board->getPieceColor(i) == kingColor) {
                     pinnedPieces.emplace(i, Directions::VERTICALDOWN);
                     break;
                 }
@@ -337,7 +338,7 @@ void GameLoop::getPinnedPieces() {
         ChessColor color = board->getPieceColor(pinnedPiece.first);
         switch (pinnedPiece.second) {
             case Directions::DIAGONALUPLEFT:
-                for (int i = pinnedPiece.first; i < 64; i -= 9) {
+                for (int i = pinnedPiece.first - 9; i < 64; i -= 9) {
                     if (board->getPieceType(i) != NONE) {
                         if (board->getPieceColor(i) == color && i != pinnedPiece.first) {
                             break;
@@ -347,6 +348,8 @@ void GameLoop::getPinnedPieces() {
                             board->pinnedPiecesBitboard |= 1ULL << pinnedPiece.first;
                             board->pinDirectionBitboards[Directions::DIAGONALUPLEFT] |= 1ULL << pinnedPiece.first;
                             break;
+                        } else {
+                            break;
                         }
                     }
                     if (i % 8 == 0) {
@@ -355,7 +358,7 @@ void GameLoop::getPinnedPieces() {
                 }
                 break;
             case Directions::DIAGONALUPRIGHT:
-                for (int i = pinnedPiece.first; i < 64; i -= 7) {
+                for (int i = pinnedPiece.first - 7; i < 64; i -= 7) {
                     if (board->getPieceType(i) != NONE) {
                         if (board->getPieceColor(i) == color && i != pinnedPiece.first) {
                             break;
@@ -365,6 +368,8 @@ void GameLoop::getPinnedPieces() {
                             board->pinnedPiecesBitboard |= 1ULL << pinnedPiece.first;
                             board->pinDirectionBitboards[Directions::DIAGONALUPRIGHT] |= 1ULL << pinnedPiece.first;
                             break;
+                        } else {
+                            break;
                         }
                     }
                     if (i % 8 == 7) {
@@ -373,7 +378,7 @@ void GameLoop::getPinnedPieces() {
                 }
                 break;
             case Directions::DIAGONALDOWNRIGHT:
-                for (int i = pinnedPiece.first; i < 64; i += 7) {
+                for (int i = pinnedPiece.first + 7; i < 64; i += 7) {
                     if (board->getPieceType(i) != NONE) {
                         if (board->getPieceColor(i) == color && i != pinnedPiece.first) {
                             break;
@@ -383,6 +388,8 @@ void GameLoop::getPinnedPieces() {
                             board->pinnedPiecesBitboard |= 1ULL << pinnedPiece.first;
                             board->pinDirectionBitboards[Directions::DIAGONALDOWNRIGHT] |= 1ULL << pinnedPiece.first;
                             break;
+                        } else {
+                            break;
                         }
                     }
                     if (i % 8 == 0) {
@@ -391,7 +398,7 @@ void GameLoop::getPinnedPieces() {
                 }
                 break;
             case Directions::DIAGONALDOWNLEFT:
-                for (int i = pinnedPiece.first; i < 64; i += 9) {
+                for (int i = pinnedPiece.first + 9; i < 64; i += 9) {
                     if (board->getPieceType(i) != NONE) {
                         if (board->getPieceColor(i) == color && i != pinnedPiece.first) {
                             break;
@@ -401,6 +408,8 @@ void GameLoop::getPinnedPieces() {
                             board->pinnedPiecesBitboard |= 1ULL << pinnedPiece.first;
                             board->pinDirectionBitboards[Directions::DIAGONALDOWNLEFT] |= 1ULL << pinnedPiece.first;
                             break;
+                        } else {
+                            break;
                         }
                     }
                     if (i % 8 == 7) {
@@ -409,7 +418,7 @@ void GameLoop::getPinnedPieces() {
                 }
                 break;
             case Directions::HORIZONTALLEFT:
-                for (int i = pinnedPiece.first; i >= 0; i--) {
+                for (int i = pinnedPiece.first - 1; i >= 0; i--) {
                     if (board->getPieceType(i) != NONE) {
                         if (board->getPieceColor(i) == color && i != pinnedPiece.first) {
                             break;
@@ -419,6 +428,8 @@ void GameLoop::getPinnedPieces() {
                             board->pinnedPiecesBitboard |= 1ULL << pinnedPiece.first;
                             board->pinDirectionBitboards[Directions::HORIZONTALLEFT] |= 1ULL << pinnedPiece.first;
                             break;
+                        } else {
+                            break;
                         }
                     }
                     if (i % 8 == 0) {
@@ -427,7 +438,7 @@ void GameLoop::getPinnedPieces() {
                 }
                 break;
             case Directions::HORIZONTALRIGHT:
-                for (int i = pinnedPiece.first; i < 64; i++) {
+                for (int i = pinnedPiece.first + 1; i < 64; i++) {
                     if (board->getPieceType(i) != NONE) {
                         if (board->getPieceColor(i) == color && i != pinnedPiece.first) {
                             break;
@@ -437,6 +448,8 @@ void GameLoop::getPinnedPieces() {
                             board->pinnedPiecesBitboard |= 1ULL << pinnedPiece.first;
                             board->pinDirectionBitboards[Directions::HORIZONTALRIGHT] |= 1ULL << pinnedPiece.first;
                             break;
+                        } else {
+                            break;
                         }
                     }
                     if (i % 8 == 7) {
@@ -445,7 +458,7 @@ void GameLoop::getPinnedPieces() {
                 }
                 break;
             case Directions::VERTICALUP:
-                for (int i = pinnedPiece.first; i < 64; i += 8) {
+                for (int i = pinnedPiece.first + 8; i < 64; i += 8) {
                     if (board->getPieceType(i) != NONE) {
                         if (board->getPieceColor(i) == color && i != pinnedPiece.first) {
                             break;
@@ -455,12 +468,14 @@ void GameLoop::getPinnedPieces() {
                             board->pinnedPiecesBitboard |= 1ULL << pinnedPiece.first;
                             board->pinDirectionBitboards[Directions::VERTICALUP] |= 1ULL << pinnedPiece.first;
                             break;
+                        } else {
+                            break;
                         }
                     }
                 }
                 break;
             case Directions::VERTICALDOWN:
-                for (int i = pinnedPiece.first; i >= 0; i -= 8) {
+                for (int i = pinnedPiece.first - 8; i >= 0; i -= 8) {
                     if (board->getPieceType(i) != NONE) {
                         if (board->getPieceColor(i) == color && i != pinnedPiece.first) {
                             break;
@@ -469,6 +484,8 @@ void GameLoop::getPinnedPieces() {
                             //pinnedPiece.first->pinDirection = Directions::VERTICALDOWN;
                             board->pinnedPiecesBitboard |= 1ULL << pinnedPiece.first;
                             board->pinDirectionBitboards[Directions::VERTICALDOWN] |= 1ULL << pinnedPiece.first;
+                            break;
+                        } else {
                             break;
                         }
                     }
